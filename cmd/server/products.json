@@ -1,0 +1,102 @@
+[
+  {
+    "id": 1,
+    "nombre": "cerveza",
+    "color": "verde",
+    "precio": 3.14,
+    "stock": 100,
+    "codigo": "ABC123",
+    "publicado": true,
+    "fecha_creacion": "2022-04-01"
+  },
+  {
+    "id": 3,
+    "nombre": "cerveza",
+    "color": "verde",
+    "precio": 3.14,
+    "stock": 100,
+    "codigo": "ABC123",
+    "publicado": true,
+    "fecha_creacion": "2022-04-01"
+  },
+  {
+    "id": 4,
+    "nombre": "carbon",
+    "color": "verde",
+    "precio": 3.14,
+    "stock": 100,
+    "codigo": "ABC123",
+    "publicado": true,
+    "fecha_creacion": "2022-04-01"
+  },
+  {
+    "id": 5,
+    "nombre": "",
+    "color": "verde",
+    "precio": 3.14,
+    "stock": 100,
+    "codigo": "ABC123",
+    "publicado": true,
+    "fecha_creacion": "2022-04-01"
+  },
+  {
+    "id": 6,
+    "nombre": "carbon",
+    "color": "verde",
+    "precio": 3.14,
+    "stock": 100,
+    "codigo": "ABC123",
+    "publicado": false,
+    "fecha_creacion": "2022-04-01"
+  },
+  {
+    "id": 7,
+    "nombre": "carbon",
+    "color": "verde",
+    "precio": 3.14,
+    "stock": 100,
+    "codigo": "ABC123",
+    "publicado": false,
+    "fecha_creacion": "2022-04-01"
+  },
+  {
+    "id": 8,
+    "nombre": "carbon",
+    "color": "verde",
+    "precio": 3.14,
+    "stock": 100,
+    "codigo": "ABC123",
+    "publicado": false,
+    "fecha_creacion": "2022-04-01"
+  },
+  {
+    "id": 9,
+    "nombre": "gin",
+    "color": "verde",
+    "precio": 12.9,
+    "stock": 100,
+    "codigo": "ABC123",
+    "publicado": true,
+    "fecha_creacion": "2022-04-01"
+  },
+  {
+    "id": 10,
+    "nombre": "leche",
+    "color": "verde",
+    "precio": 7.6,
+    "stock": 100,
+    "codigo": "ABC123",
+    "publicado": true,
+    "fecha_creacion": "2022-04-01"
+  },
+  {
+    "id": 11,
+    "nombre": "gin",
+    "color": "verde",
+    "precio": 12.9,
+    "stock": 100,
+    "codigo": "ABC123",
+    "publicado": true,
+    "fecha_creacion": "2022-04-01"
+  }
+]

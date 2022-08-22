@@ -1,0 +1,32 @@
+[
+  {
+    "Id":            1,
+		"Nombre":        "Fabio",
+		"Apellido":      "Quattordio",
+		"Email":         "juanmaria.quattordio@ml.com",
+		"Edad":          31,
+		"Altura":        1.79,
+		"Activo":        false,
+		"FechaCreacion": "2022-04-01"
+  }, 
+  {
+    "Id":            2,
+		"Nombre":        "Carlos",
+		"Apellido":      "Quattordio",
+		"Email":         "juanmaria.quattordio@ml.com",
+		"Edad":          31,
+		"Altura":        1.79,
+		"Activo":        false,
+		"FechaCreacion": "2022-04-01"
+  }, 
+  {
+    "Id":            4,
+		"Nombre":        "Ricardo",
+		"Apellido":      "Quattordio",
+		"Email":         "juanmaria.quattordio@ml.com",
+		"Edad":          31,
+		"Altura":        1.79,
+		"Activo":        false,
+		"FechaCreacion": "2022-04-01"
+  }
+]
