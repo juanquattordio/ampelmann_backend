@@ -3,10 +3,10 @@ package productos
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/go_web/C2-tt-Estructuras/src/api/config/util"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/go_web/C2-tt-Estructuras/pkg/util"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -4,15 +4,15 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/go_web/C2-tt-Estructuras/src/api/config/store"
+	"github.com/go_web/C2-tt-Estructuras/src/api/entrypoints/handler"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go_web/C2-tt-Estructuras/cmd/server/handler"
 	"github.com/go_web/C2-tt-Estructuras/internal/productos"
-	"github.com/go_web/C2-tt-Estructuras/pkg/store"
 	"github.com/stretchr/testify/assert"
 )
 

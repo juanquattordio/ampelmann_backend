@@ -4,9 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"github.com/go_web/C2-tt-Estructuras/src/api/config/store"
 	"log"
-
-	"github.com/go_web/C2-tt-Estructuras/pkg/store"
 )
 
 type Product struct {

@@ -2,8 +2,7 @@ package usuarios
 
 import (
 	"fmt"
-
-	"github.com/go_web/C2-tt-Estructuras/pkg/store"
+	"github.com/go_web/C2-tt-Estructuras/src/api/config/store"
 )
 
 // type UsuarioRepository struct {

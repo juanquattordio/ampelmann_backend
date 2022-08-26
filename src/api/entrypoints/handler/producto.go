@@ -11,7 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go_web/C2-tt-Estructuras/internal/productos"
-	"github.com/go_web/C2-tt-Estructuras/pkg/web"
+	"github.com/go_web/C2-tt-Estructuras/src/api/config/web"
 )
 
 type request struct {

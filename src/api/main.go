@@ -2,15 +2,14 @@ package main
 
 import (
 	"fmt"
+	"github.com/go_web/C2-tt-Estructuras/src/api/config/db"
+	"github.com/go_web/C2-tt-Estructuras/src/api/entrypoints/handler"
 	"log"
 	"os"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go_web/C2-tt-Estructuras/cmd/server/handler"
-	"github.com/go_web/C2-tt-Estructuras/internal/productos"
-	"github.com/go_web/C2-tt-Estructuras/pkg/db"
-
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/go_web/C2-tt-Estructuras/internal/productos"
 	"github.com/joho/godotenv"
 )
 
