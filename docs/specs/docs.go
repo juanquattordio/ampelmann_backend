@@ -81,7 +81,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/handler.request"
+                            "$ref": "#/definitions/handlers.request"
                         }
                     }
                 ],
@@ -97,7 +97,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "handler.request": {
+        "handlers.request": {
             "type": "object",
             "properties": {
                 "codigo": {
