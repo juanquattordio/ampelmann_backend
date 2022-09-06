@@ -1,6 +1,6 @@
 package entities
 
-type Cliente struct {
+type Proveedor struct {
 	ID        int64
 	Cuit      string
 	Nombre    string
@@ -9,8 +9,8 @@ type Cliente struct {
 	Status    string
 }
 
-func NewCliente(cuit string, nombre string, ubicacion string, email string, status string) *Cliente {
-	cliente := &Cliente{
+func NewProveedor(cuit string, nombre string, ubicacion string, email string, status string) *Proveedor {
+	proveedor := &Proveedor{
 		Cuit:      cuit,
 		Nombre:    nombre,
 		Ubicacion: ubicacion,
@@ -18,5 +18,5 @@ func NewCliente(cuit string, nombre string, ubicacion string, email string, stat
 		Status:    status,
 	}
 
-	return cliente
+	return proveedor
 }

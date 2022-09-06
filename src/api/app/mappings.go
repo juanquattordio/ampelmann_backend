@@ -14,5 +14,6 @@ func configureAPIMappings(router *gin.Engine, handlers *dependencies.HandlerCont
 
 	clientes := ampelmannGroup.Group("/clientes")
 	clientes.POST("", handlers.CreateCliente.Handle)
+	clientes.GET("", handlers.SearchCliente.Handle)
 
 }

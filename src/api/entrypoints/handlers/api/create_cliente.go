@@ -12,12 +12,6 @@ type CreateCliente struct {
 	CreateClienteUseCase create_cliente.UseCase
 }
 
-func NewCreateCliente(useCase create_cliente.UseCase) *CreateCliente {
-	return &CreateCliente{
-		CreateClienteUseCase: useCase,
-	}
-}
-
 func (handler CreateCliente) Handle(ginContext *gin.Context) {
 	handler.handle(ginContext)
 }

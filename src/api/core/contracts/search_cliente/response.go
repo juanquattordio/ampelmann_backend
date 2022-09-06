@@ -1,4 +1,4 @@
-package create_cliente
+package search_cliente
 
 import (
 	"fmt"
