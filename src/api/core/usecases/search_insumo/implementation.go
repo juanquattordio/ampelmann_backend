@@ -1,4 +1,4 @@
-package search_cliente
+package search_insumo
 
 import (
 	"context"
@@ -8,19 +8,19 @@ import (
 )
 
 type Implementation struct {
-	ClienteProvider providers.Cliente
+	InsumoProvider providers.Insumo
 }
 
 var (
-	ErrNotFound    = errors.New("cliente not found")
+	ErrNotFound    = errors.New("insumo not found")
 	ErrInternal    = errors.New("internal error")
 	ErrWhCodeEmpty = errors.New("some fields can not be empty. Operation cancelled.")
 )
 
-func (uc *Implementation) Execute(ctx context.Context, id *int64, cuit *string) (*entities.Cliente, error) {
-	cliente, err := uc.ClienteProvider.Search(id, cuit)
+func (uc *Implementation) Execute(ctx context.Context, id *int64, nombre *string) (*entities.Insumo, error) {
+	insumo, err := uc.InsumoProvider.Search(id, nombre)
 	if err != nil {
 		return nil, err
 	}
-	return cliente, nil
+	return insumo, nil
 }

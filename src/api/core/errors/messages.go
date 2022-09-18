@@ -3,6 +3,7 @@ package errors
 import "fmt"
 
 type Message string
+type Parameters map[string]interface{}
 
 const (
 	Generic        Message = "Error trying to %v %v."

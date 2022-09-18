@@ -3,22 +3,22 @@ package api
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/juanquattordio/ampelmann_backend/src/api/config/web"
-	contracts "github.com/juanquattordio/ampelmann_backend/src/api/core/contracts/create_cliente"
-	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/create_cliente"
-	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/search_cliente"
+	contracts "github.com/juanquattordio/ampelmann_backend/src/api/core/contracts/create_insumo"
+	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/create_insumo"
+	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/search_insumo"
 	"net/http"
 )
 
-type CreateCliente struct {
-	CreateClienteUseCase create_cliente.UseCase
-	SearchClienteUseCase search_cliente.UseCase
+type CreateInsumo struct {
+	CreateInsumoUseCase create_insumo.UseCase
+	SearchInsumoUseCase search_insumo.UseCase
 }
 
-func (handler CreateCliente) Handle(ginContext *gin.Context) {
+func (handler CreateInsumo) Handle(ginContext *gin.Context) {
 	handler.handle(ginContext)
 }
 
-func (handler CreateCliente) handle(ctx *gin.Context) {
+func (handler CreateInsumo) handle(ctx *gin.Context) {
 
 	//token := ctx.Request.Header.Get("token")
 	//fmt.Printf("token: " + token)
@@ -35,12 +35,12 @@ func (handler CreateCliente) handle(ctx *gin.Context) {
 		ctx.JSON(404, web.NewResponse(400, nil, err.Error()))
 		return
 	}
-	newCliente, err := handler.CreateClienteUseCase.Execute(ctx, request)
+	newInsumo, err := handler.CreateInsumoUseCase.Execute(ctx, request)
 	if err != nil {
 		ctx.JSON(404, web.NewResponse(404, nil, err.Error()))
 		//		ctx.JSON(404, web.NewResponse(404, nil, "Error al ejecutar Store"))
 		return
 	}
-	ctx.JSON(http.StatusCreated, contracts.NewResponse(newCliente))
+	ctx.JSON(http.StatusCreated, contracts.NewResponse(newInsumo))
 
 }

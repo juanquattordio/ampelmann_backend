@@ -12,8 +12,14 @@ func configureMappings(router *gin.Engine, handlers *dependencies.HandlerContain
 func configureAPIMappings(router *gin.Engine, handlers *dependencies.HandlerContainer) {
 	ampelmannGroup := router.Group("/ampelmann")
 
+	// Clientes endpoints
 	clientes := ampelmannGroup.Group("/clientes")
 	clientes.POST("", handlers.CreateCliente.Handle)
 	clientes.GET("", handlers.SearchCliente.Handle)
+
+	// Insumos endpoints
+	insumos := ampelmannGroup.Group("/insumos")
+	insumos.POST("", handlers.CreateInsumo.Handle)
+	insumos.GET("", handlers.SearchInsumo.Handle)
 
 }

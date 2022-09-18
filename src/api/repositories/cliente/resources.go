@@ -32,8 +32,8 @@ func newEntity(c entities.Cliente) cliente {
 	}
 }
 
-func (dbItem cliente) toEntity() entities.Cliente {
-	return entities.Cliente{
+func (dbItem cliente) toEntity() *entities.Cliente {
+	return &entities.Cliente{
 		ID:        dbItem.ID,
 		Cuit:      dbItem.Cuit,
 		Nombre:    dbItem.Nombre,

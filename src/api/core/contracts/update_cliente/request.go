@@ -7,3 +7,7 @@ type Request struct {
 	Email     *string `form:"email" json:"email" binding:""`
 	Status    *string `form:"status" json:"status" binding:""`
 }
+
+func (command Request) Validate() error {
+	return nil
+}

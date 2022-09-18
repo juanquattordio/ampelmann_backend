@@ -1,6 +1,8 @@
 package api
 
 import (
+	"database/sql"
+	goErrors "errors"
 	"github.com/gin-gonic/gin"
 	"github.com/juanquattordio/ampelmann_backend/src/api/config/web"
 	contracts "github.com/juanquattordio/ampelmann_backend/src/api/core/contracts/search_cliente"
@@ -31,9 +33,13 @@ func (handler SearchCliente) handle(ctx *gin.Context) {
 	cuit := ctx.Query("cuit")
 	request.Cuit = &cuit
 
-	clienteResult, err := handler.SearchClienteUseCase.Execute(ctx, request)
+	clienteResult, err := handler.SearchClienteUseCase.Execute(ctx, request.Id, request.Cuit)
 	if err != nil {
-		ctx.JSON(404, web.NewResponse(404, nil, err.Error()))
+		if goErrors.Is(err, sql.ErrNoRows) {
+			ctx.JSON(404, web.NewResponse(404, nil, "Source not found"))
+		} else {
+			ctx.JSON(404, web.NewResponse(404, nil, err.Error()))
+		}
 		return
 	}
 	ctx.JSON(http.StatusOK, contracts.NewResponse(clienteResult))

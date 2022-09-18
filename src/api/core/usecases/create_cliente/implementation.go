@@ -2,9 +2,11 @@ package create_cliente
 
 import (
 	"context"
-	"errors"
+	"database/sql"
+	goErrors "errors"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/contracts/create_cliente"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/entities"
+	"github.com/juanquattordio/ampelmann_backend/src/api/core/errors"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/providers"
 )
 
@@ -13,17 +15,22 @@ type Implementation struct {
 }
 
 var (
-	ErrNotFound    = errors.New("cliente not found")
-	ErrDuplicate   = errors.New("cuit already exists. Operation cancelled.")
-	ErrInternal    = errors.New("internal error")
-	ErrWhCodeEmpty = errors.New("some fields can not be empty. Operation cancelled.")
+	ErrNotFound    = goErrors.New("cliente not found")
+	ErrDuplicate   = goErrors.New("cuit already exists. Operation cancelled.")
+	ErrInternal    = goErrors.New("internal error")
+	ErrWhCodeEmpty = goErrors.New("some fields can not be empty. Operation cancelled.")
 )
 
 func (uc *Implementation) Execute(ctx context.Context, request create_cliente.Request) (*entities.Cliente, error) {
+	clienteExists, err := uc.ClienteProvider.Search(nil, request.Cuit)
+	if clienteExists != nil && !goErrors.Is(err, sql.ErrNoRows) {
+		return nil, errors.NewInternalServer("Cliente ya existente")
+	}
+
 	status := "activo"
 	newCliente := entities.NewCliente(*request.Cuit, *request.Nombre, *request.Ubicacion, *request.Email, status)
 
-	err := uc.ClienteProvider.Save(*newCliente)
+	err = uc.ClienteProvider.Save(*newCliente)
 	if err != nil {
 		return &entities.Cliente{}, err
 	}

@@ -2,7 +2,6 @@ package cliente
 
 import (
 	"github.com/jmoiron/sqlx"
-	"github.com/juanquattordio/ampelmann_backend/src/api/core/contracts/search_cliente"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/entities"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/providers"
 	"strings"
@@ -38,29 +37,29 @@ func (r repository) Save(cliente entities.Cliente) error {
 func (r repository) GetLastID() (int64, error) {
 	return LastIdCliente, nil
 }
-func (r repository) Search(request search_cliente.Request) (entities.Cliente, error) {
-	whereConditions, args := buildSearchWhere(request)
+func (r repository) Search(id *int64, cuit *string) (*entities.Cliente, error) {
+	whereConditions, args := buildSearchWhere(id, cuit)
 	searchScript := selectScriptMySQL + whereConditions
 	dbCliente := new(cliente)
 
 	err := r.db.Get(dbCliente, searchScript, args...)
 
 	if err != nil {
-		return entities.Cliente{}, err
+		return nil, err
 	}
 
 	clienteResult := dbCliente.toEntity()
 	return clienteResult, nil
 }
 
-func buildSearchWhere(filter search_cliente.Request) (query string, args []interface{}) {
-	if filter.Id != nil {
+func buildSearchWhere(id *int64, cuit *string) (query string, args []interface{}) {
+	if id != nil {
 		query += " AND idCliente = ?"
-		args = append(args, filter.Id)
+		args = append(args, id)
 	}
-	if *filter.Cuit != "" {
+	if *cuit != "" {
 		query += " AND cuit = ?"
-		args = append(args, filter.Cuit)
+		args = append(args, cuit)
 	}
 
 	return strings.Replace(query, " AND ", " WHERE ", 1), args

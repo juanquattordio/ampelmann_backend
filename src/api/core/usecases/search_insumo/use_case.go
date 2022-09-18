@@ -1,4 +1,4 @@
-package search_cliente
+package search_insumo
 
 import (
 	"context"
@@ -6,5 +6,5 @@ import (
 )
 
 type UseCase interface {
-	Execute(context context.Context, id *int64, cuit *string) (*entities.Cliente, error)
+	Execute(context context.Context, id *int64, nombre *string) (*entities.Insumo, error)
 }
