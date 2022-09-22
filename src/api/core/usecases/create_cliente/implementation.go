@@ -26,8 +26,7 @@ func (uc *Implementation) Execute(ctx context.Context, request create_cliente.Re
 		return nil, ErrDuplicate
 	}
 
-	status := "activo"
-	newCliente := entities.NewCliente(*request.Cuit, *request.Nombre, *request.Ubicacion, *request.Email, status)
+	newCliente := entities.NewCliente(*request.Cuit, *request.Nombre, *request.Ubicacion, *request.Email)
 
 	err = uc.ClienteProvider.Save(*newCliente)
 	if err != nil {

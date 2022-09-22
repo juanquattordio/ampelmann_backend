@@ -1,6 +1,8 @@
 package cliente
 
-import "github.com/juanquattordio/ampelmann_backend/src/api/core/entities"
+import (
+	"github.com/juanquattordio/ampelmann_backend/src/api/core/entities"
+)
 
 const (
 	resource = "cliente"
