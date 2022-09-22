@@ -12,9 +12,8 @@ type Implementation struct {
 }
 
 var (
-	ErrNotFound    = errors.New("cliente not found")
-	ErrInternal    = errors.New("internal error")
-	ErrWhCodeEmpty = errors.New("some fields can not be empty. Operation cancelled.")
+	ErrNotFound = errors.New("cliente not found")
+	ErrInternal = errors.New("internal error")
 )
 
 func (uc *Implementation) Execute(ctx context.Context, id *int64, cuit *string) (*entities.Cliente, error) {

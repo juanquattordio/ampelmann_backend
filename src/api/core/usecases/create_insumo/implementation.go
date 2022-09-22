@@ -14,10 +14,9 @@ type Implementation struct {
 }
 
 var (
-	ErrNotFound    = goErrors.New("insumo not found")
-	ErrDuplicate   = goErrors.New("name already exists. Operation cancelled.")
-	ErrInternal    = goErrors.New("internal error")
-	ErrWhCodeEmpty = goErrors.New("some fields can not be empty. Operation cancelled.")
+	ErrNotFound  = goErrors.New("insumo not found")
+	ErrDuplicate = goErrors.New("name already exists. Operation cancelled.")
+	ErrInternal  = goErrors.New("internal error")
 )
 
 func (uc *Implementation) Execute(ctx context.Context, request create_insumo.Request) (*entities.Insumo, error) {

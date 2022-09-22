@@ -40,6 +40,8 @@ func (handler UpdateInsumo) handle(ctx *gin.Context) {
 			ctx.JSON(http.StatusBadRequest, web.NewResponse(http.StatusBadRequest, nil, err.Error()))
 		case update_insumo.ErrNotFound:
 			ctx.JSON(http.StatusNotFound, web.NewResponse(http.StatusNotFound, nil, err.Error()))
+		case update_insumo.ErrAllreadyCancelled:
+			ctx.JSON(http.StatusBadRequest, web.NewResponse(http.StatusBadRequest, nil, err.Error()))
 		default:
 			ctx.JSON(http.StatusInternalServerError, web.NewResponse(http.StatusInternalServerError, nil, err.Error()))
 		}

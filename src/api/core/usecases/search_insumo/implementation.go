@@ -12,9 +12,8 @@ type Implementation struct {
 }
 
 var (
-	ErrNotFound    = errors.New("insumo not found")
-	ErrInternal    = errors.New("internal error")
-	ErrWhCodeEmpty = errors.New("some fields can not be empty. Operation cancelled.")
+	ErrNotFound = errors.New("insumo not found")
+	ErrInternal = errors.New("internal error")
 )
 
 func (uc *Implementation) Execute(ctx context.Context, id *int64, nombre *string) (*entities.Insumo, error) {

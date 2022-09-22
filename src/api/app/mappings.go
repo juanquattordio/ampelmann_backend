@@ -22,5 +22,6 @@ func configureAPIMappings(router *gin.Engine, handlers *dependencies.HandlerCont
 	insumos.POST("", handlers.CreateInsumo.Handle)
 	insumos.GET("", handlers.SearchInsumo.Handle)
 	insumos.PATCH("/:id", handlers.UpdateInsumo.Handle)
+	insumos.PATCH("/cancel/:id", handlers.UpdateInsumo.Handle)
 
 }
