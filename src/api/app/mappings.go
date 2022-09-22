@@ -21,5 +21,6 @@ func configureAPIMappings(router *gin.Engine, handlers *dependencies.HandlerCont
 	insumos := ampelmannGroup.Group("/insumos")
 	insumos.POST("", handlers.CreateInsumo.Handle)
 	insumos.GET("", handlers.SearchInsumo.Handle)
+	insumos.PATCH("/:id", handlers.UpdateInsumo.Handle)
 
 }

@@ -6,7 +6,6 @@ import (
 	goErrors "errors"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/contracts/create_cliente"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/entities"
-	"github.com/juanquattordio/ampelmann_backend/src/api/core/errors"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/providers"
 )
 
@@ -18,13 +17,13 @@ var (
 	ErrNotFound    = goErrors.New("cliente not found")
 	ErrDuplicate   = goErrors.New("cuit already exists. Operation cancelled.")
 	ErrInternal    = goErrors.New("internal error")
-	ErrWhCodeEmpty = goErrors.New("some fields can not be empty. Operation cancelled.")
+	ErrFieldsEmpty = goErrors.New("some fields can not be empty. Operation cancelled.")
 )
 
 func (uc *Implementation) Execute(ctx context.Context, request create_cliente.Request) (*entities.Cliente, error) {
 	clienteExists, err := uc.ClienteProvider.Search(nil, request.Cuit)
 	if clienteExists != nil && !goErrors.Is(err, sql.ErrNoRows) {
-		return nil, errors.NewInternalServer("Cliente ya existente")
+		return nil, ErrDuplicate
 	}
 
 	status := "activo"

@@ -10,6 +10,7 @@ const (
 	saveScriptMySQL = "INSERT INTO Insumo(nombre, stock, status)" +
 		"VALUES(?, ?, ?) "
 	selectScriptMySQL = "SELECT idInsumo, nombre, stock, status FROM Insumo"
+	updateScriptMySQL = "UPDATE Insumo SET nombre = ?, stock = ?, status = ?"
 )
 
 type insumo struct {

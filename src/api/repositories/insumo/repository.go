@@ -7,12 +7,12 @@ import (
 	"strings"
 )
 
-type repository struct {
+type Repository struct {
 	db *sqlx.DB
 }
 
 func NewRepository(db *sqlx.DB) providers.Insumo {
-	repo := repository{
+	repo := Repository{
 		db: db,
 	}
 	return &repo
@@ -20,7 +20,7 @@ func NewRepository(db *sqlx.DB) providers.Insumo {
 
 var LastIdInsumo int64
 
-func (r repository) Save(insumo entities.Insumo) error {
+func (r *Repository) Save(insumo entities.Insumo) error {
 
 	stmt, err := r.db.Prepare(saveScriptMySQL)
 	if err != nil {
@@ -34,10 +34,10 @@ func (r repository) Save(insumo entities.Insumo) error {
 	LastIdInsumo = insertedId
 	return nil
 }
-func (r repository) GetLastID() (int64, error) {
+func (r *Repository) GetLastID() (int64, error) {
 	return LastIdInsumo, nil
 }
-func (r repository) Search(id *int64, nombre *string) (*entities.Insumo, error) {
+func (r *Repository) Search(id *int64, nombre *string) (*entities.Insumo, error) {
 	whereConditions, args := buildSearchWhere(id, nombre)
 	searchScript := selectScriptMySQL + whereConditions
 	dbInsumo := new(insumo)
@@ -51,13 +51,26 @@ func (r repository) Search(id *int64, nombre *string) (*entities.Insumo, error) 
 	insumoResult := dbInsumo.toEntity()
 	return insumoResult, nil
 }
+func (r *Repository) Update(insumo *entities.Insumo) error {
+
+	stmt, err := r.db.Prepare(updateScriptMySQL)
+	if err != nil {
+		return err
+	}
+	_, err = stmt.Exec(insumo.Nombre, insumo.Stock, insumo.Status)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
 
 func buildSearchWhere(id *int64, nombre *string) (query string, args []interface{}) {
 	if id != nil {
 		query += " AND idInsumo = ?"
 		args = append(args, id)
 	}
-	if *nombre != "" {
+	if nombre != nil && *nombre != "" {
 		query += " AND nombre = ?"
 		args = append(args, nombre)
 	}

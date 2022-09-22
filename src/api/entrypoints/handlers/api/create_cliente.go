@@ -5,13 +5,11 @@ import (
 	"github.com/juanquattordio/ampelmann_backend/src/api/config/web"
 	contracts "github.com/juanquattordio/ampelmann_backend/src/api/core/contracts/create_cliente"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/create_cliente"
-	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/search_cliente"
 	"net/http"
 )
 
 type CreateCliente struct {
 	CreateClienteUseCase create_cliente.UseCase
-	SearchClienteUseCase search_cliente.UseCase
 }
 
 func (handler CreateCliente) Handle(ginContext *gin.Context) {
@@ -37,9 +35,12 @@ func (handler CreateCliente) handle(ctx *gin.Context) {
 	}
 	newCliente, err := handler.CreateClienteUseCase.Execute(ctx, request)
 	if err != nil {
-		ctx.JSON(404, web.NewResponse(404, nil, err.Error()))
-		//		ctx.JSON(404, web.NewResponse(404, nil, "Error al ejecutar Store"))
-		return
+		switch err {
+		case create_cliente.ErrDuplicate:
+			ctx.JSON(http.StatusInternalServerError, web.NewResponse(http.StatusInternalServerError, nil, err.Error()))
+		default:
+			ctx.JSON(http.StatusInternalServerError, web.NewResponse(http.StatusInternalServerError, nil, err.Error()))
+		}
 	}
 	ctx.JSON(http.StatusCreated, contracts.NewResponse(newCliente))
 

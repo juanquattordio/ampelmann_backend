@@ -6,6 +6,7 @@ import (
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/create_insumo"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/search_cliente"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/search_insumo"
+	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/update_insumo"
 	"github.com/juanquattordio/ampelmann_backend/src/api/entrypoints"
 	"github.com/juanquattordio/ampelmann_backend/src/api/entrypoints/handlers/api"
 	"github.com/juanquattordio/ampelmann_backend/src/api/repositories/cliente"
@@ -17,6 +18,7 @@ type HandlerContainer struct {
 	SearchCliente entrypoints.Handler
 	CreateInsumo  entrypoints.Handler
 	SearchInsumo  entrypoints.Handler
+	UpdateInsumo  entrypoints.Handler
 }
 
 func Start() *HandlerContainer {
@@ -41,6 +43,9 @@ func Start() *HandlerContainer {
 	searchInsumoUseCase := &search_insumo.Implementation{
 		InsumoProvider: insumoRepository,
 	}
+	updateInsumoUseCase := &update_insumo.Implementation{
+		InsumoProvider: insumoRepository,
+	}
 
 	// API handlers
 	handlers := HandlerContainer{}
@@ -55,6 +60,9 @@ func Start() *HandlerContainer {
 	}
 	handlers.SearchInsumo = &api.SearchInsumo{
 		SearchInsumoUseCase: searchInsumoUseCase,
+	}
+	handlers.UpdateInsumo = &api.UpdateInsumo{
+		UpdateInsumoUseCase: updateInsumoUseCase,
 	}
 
 	return &handlers

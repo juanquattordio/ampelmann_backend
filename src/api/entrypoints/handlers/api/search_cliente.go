@@ -33,6 +33,12 @@ func (handler SearchCliente) handle(ctx *gin.Context) {
 	cuit := ctx.Query("cuit")
 	request.Cuit = &cuit
 
+	err := request.Validate()
+	if err != nil {
+		ctx.JSON(500, web.NewResponse(500, nil, err.Error()))
+		return
+	}
+
 	clienteResult, err := handler.SearchClienteUseCase.Execute(ctx, request.Id, request.Cuit)
 	if err != nil {
 		if goErrors.Is(err, sql.ErrNoRows) {

@@ -6,7 +6,6 @@ import (
 	goErrors "errors"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/contracts/create_insumo"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/entities"
-	"github.com/juanquattordio/ampelmann_backend/src/api/core/errors"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/providers"
 )
 
@@ -24,7 +23,7 @@ var (
 func (uc *Implementation) Execute(ctx context.Context, request create_insumo.Request) (*entities.Insumo, error) {
 	insumoExists, err := uc.InsumoProvider.Search(nil, request.Nombre)
 	if insumoExists != nil && !goErrors.Is(err, sql.ErrNoRows) {
-		return nil, errors.NewInternalServer("Insumo ya existente")
+		return nil, ErrDuplicate
 	}
 
 	newInsumo := entities.NewInsumo(*request.Nombre, *request.Stock)

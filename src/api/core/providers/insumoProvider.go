@@ -5,7 +5,8 @@ import (
 )
 
 type Insumo interface {
-	Save(cliente entities.Insumo) error
+	Save(insumo entities.Insumo) error
 	GetLastID() (int64, error)
 	Search(id *int64, nombre *string) (*entities.Insumo, error)
+	Update(insumo *entities.Insumo) error
 }
