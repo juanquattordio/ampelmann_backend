@@ -3,17 +3,20 @@ package dependencies
 import (
 	"github.com/juanquattordio/ampelmann_backend/src/api/config/db"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/create_cliente"
+	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/create_deposito"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/create_insumo"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/create_proveedor"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/search_cliente"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/search_insumo"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/search_proveedor"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/update_cliente"
+	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/update_deposito"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/update_insumo"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/update_proveedor"
 	"github.com/juanquattordio/ampelmann_backend/src/api/entrypoints"
 	"github.com/juanquattordio/ampelmann_backend/src/api/entrypoints/handlers/api"
 	"github.com/juanquattordio/ampelmann_backend/src/api/repositories/cliente"
+	"github.com/juanquattordio/ampelmann_backend/src/api/repositories/deposito"
 	"github.com/juanquattordio/ampelmann_backend/src/api/repositories/insumo"
 	"github.com/juanquattordio/ampelmann_backend/src/api/repositories/proveedor"
 )
@@ -28,6 +31,8 @@ type HandlerContainer struct {
 	CreateInsumo    entrypoints.Handler
 	SearchInsumo    entrypoints.Handler
 	UpdateInsumo    entrypoints.Handler
+	CreateDeposito  entrypoints.Handler
+	UpdateDeposito  entrypoints.Handler
 }
 
 func Start() *HandlerContainer {
@@ -39,6 +44,7 @@ func Start() *HandlerContainer {
 	clienteRepository := cliente.NewRepository(DB)
 	proveedorRepository := proveedor.NewRepository(DB)
 	insumoRepository := insumo.NewRepository(DB)
+	depositoRepository := deposito.NewRepository(DB)
 
 	// Use Cases
 	createClienteUseCase := &create_cliente.Implementation{
@@ -67,6 +73,12 @@ func Start() *HandlerContainer {
 	}
 	updateInsumoUseCase := &update_insumo.Implementation{
 		InsumoProvider: insumoRepository,
+	}
+	createDepositoUseCase := &create_deposito.Implementation{
+		DepositoProvider: depositoRepository,
+	}
+	updateDepositoUseCase := &update_deposito.Implementation{
+		DepositoProvider: depositoRepository,
 	}
 
 	// API handlers
@@ -97,6 +109,12 @@ func Start() *HandlerContainer {
 	}
 	handlers.UpdateInsumo = &api.UpdateInsumo{
 		UpdateInsumoUseCase: updateInsumoUseCase,
+	}
+	handlers.CreateDeposito = &api.CreateDeposito{
+		CreateDepositoUseCase: createDepositoUseCase,
+	}
+	handlers.UpdateDeposito = &api.UpdateDeposito{
+		UpdateDepositoUseCase: updateDepositoUseCase,
 	}
 
 	return &handlers

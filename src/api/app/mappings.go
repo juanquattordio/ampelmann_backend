@@ -32,4 +32,10 @@ func configureAPIMappings(router *gin.Engine, handlers *dependencies.HandlerCont
 	proveedores.GET("", handlers.SearchProveedor.Handle)
 	proveedores.PATCH("/:id", handlers.UpdateProveedor.Handle)
 	proveedores.PATCH("/:id/cancel", handlers.UpdateProveedor.Handle)
+
+	// Depositos endpoints
+	depositos := ampelmannGroup.Group("/depositos")
+	depositos.POST("", handlers.CreateDeposito.Handle)
+	depositos.PATCH("/:id", handlers.UpdateDeposito.Handle)
+	depositos.PATCH("/:id/cancel", handlers.UpdateDeposito.Handle)
 }
