@@ -1,21 +1,23 @@
 package entities
 
+import "github.com/juanquattordio/ampelmann_backend/src/api/core/entities/constants"
+
 type Proveedor struct {
 	ID        int64
 	Cuit      string
 	Nombre    string
 	Ubicacion string
-	Email     string
+	PaginaWeb string
 	Status    string
 }
 
-func NewProveedor(cuit string, nombre string, ubicacion string, email string, status string) *Proveedor {
+func NewProveedor(cuit string, nombre string, ubicacion string, paginaWeb string) *Proveedor {
 	proveedor := &Proveedor{
 		Cuit:      cuit,
 		Nombre:    nombre,
 		Ubicacion: ubicacion,
-		Email:     email,
-		Status:    status,
+		PaginaWeb: paginaWeb,
+		Status:    constants.Activo,
 	}
 
 	return proveedor

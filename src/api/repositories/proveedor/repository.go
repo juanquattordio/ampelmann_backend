@@ -1,4 +1,4 @@
-package cliente
+package proveedor
 
 import (
 	"github.com/jmoiron/sqlx"
@@ -11,50 +11,50 @@ type Repository struct {
 	db *sqlx.DB
 }
 
-func NewRepository(db *sqlx.DB) providers.Cliente {
+func NewRepository(db *sqlx.DB) providers.Proveedor {
 	repo := Repository{
 		db: db,
 	}
 	return &repo
 }
 
-var LastIdCliente int64
+var LastIdProveedor int64
 
-func (r *Repository) Save(cliente entities.Cliente) error {
+func (r *Repository) Save(proveedor entities.Proveedor) error {
 
 	stmt, err := r.db.Prepare(saveScriptMySQL)
 	if err != nil {
 		return err
 	}
-	result, err := stmt.Exec(cliente.Cuit, cliente.Nombre, cliente.Ubicacion, cliente.Email, cliente.Status)
+	result, err := stmt.Exec(proveedor.Cuit, proveedor.Nombre, proveedor.Ubicacion, proveedor.PaginaWeb, proveedor.Status)
 	if err != nil {
 		return err
 	}
 	insertedId, _ := result.LastInsertId()
-	LastIdCliente = insertedId
+	LastIdProveedor = insertedId
 	return nil
 }
 func (r *Repository) GetLastID() (int64, error) {
-	return LastIdCliente, nil
+	return LastIdProveedor, nil
 }
-func (r *Repository) Search(id *int64, cuit *string) (*entities.Cliente, error) {
+func (r *Repository) Search(id *int64, cuit *string) (*entities.Proveedor, error) {
 	whereConditions, args := buildSearchWhere(id, cuit)
 	searchScript := selectScriptMySQL + whereConditions
-	dbCliente := new(cliente)
+	dbProveedor := new(proveedor)
 
-	err := r.db.Get(dbCliente, searchScript, args...)
+	err := r.db.Get(dbProveedor, searchScript, args...)
 
 	if err != nil {
 		return nil, err
 	}
 
-	clienteResult := dbCliente.toEntity()
-	return clienteResult, nil
+	proveedorResult := dbProveedor.toEntity()
+	return proveedorResult, nil
 }
 
 func buildSearchWhere(id *int64, cuit *string) (query string, args []interface{}) {
 	if id != nil {
-		query += " AND idCliente = ?"
+		query += " AND idProveedor = ?"
 		args = append(args, id)
 	}
 	if cuit != nil && *cuit != "" {
@@ -65,12 +65,13 @@ func buildSearchWhere(id *int64, cuit *string) (query string, args []interface{}
 	return strings.Replace(query, " AND ", " WHERE ", 1), args
 }
 
-func (r *Repository) Update(cliente *entities.Cliente) error {
+func (r *Repository) Update(proveedor *entities.Proveedor) error {
+
 	stmt, err := r.db.Prepare(updateScriptMySQL)
 	if err != nil {
 		return err
 	}
-	_, err = stmt.Exec(cliente.Cuit, cliente.Nombre, cliente.Ubicacion, cliente.Email, cliente.Status, cliente.ID)
+	_, err = stmt.Exec(proveedor.Cuit, proveedor.Nombre, proveedor.Ubicacion, proveedor.PaginaWeb, proveedor.Status, proveedor.ID)
 	if err != nil {
 		return err
 	}

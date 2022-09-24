@@ -14,7 +14,6 @@ type Implementation struct {
 }
 
 var (
-	ErrNotFound    = goErrors.New("cliente not found")
 	ErrDuplicate   = goErrors.New("cuit already exists. Operation cancelled.")
 	ErrInternal    = goErrors.New("internal error")
 	ErrFieldsEmpty = goErrors.New("some fields can not be empty. Operation cancelled.")

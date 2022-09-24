@@ -16,12 +16,20 @@ func configureAPIMappings(router *gin.Engine, handlers *dependencies.HandlerCont
 	clientes := ampelmannGroup.Group("/clientes")
 	clientes.POST("", handlers.CreateCliente.Handle)
 	clientes.GET("", handlers.SearchCliente.Handle)
+	clientes.PATCH("/:id", handlers.UpdateCliente.Handle)
+	clientes.PATCH("/:id/cancel", handlers.UpdateCliente.Handle)
 
 	// Insumos endpoints
 	insumos := ampelmannGroup.Group("/insumos")
 	insumos.POST("", handlers.CreateInsumo.Handle)
 	insumos.GET("", handlers.SearchInsumo.Handle)
 	insumos.PATCH("/:id", handlers.UpdateInsumo.Handle)
-	insumos.PATCH("/cancel/:id", handlers.UpdateInsumo.Handle)
+	insumos.PATCH("/:id/cancel", handlers.UpdateInsumo.Handle)
 
+	// Proveedores endpoints
+	proveedores := ampelmannGroup.Group("/proveedores")
+	proveedores.POST("", handlers.CreateProveedor.Handle)
+	proveedores.GET("", handlers.SearchProveedor.Handle)
+	proveedores.PATCH("/:id", handlers.UpdateProveedor.Handle)
+	proveedores.PATCH("/:id/cancel", handlers.UpdateProveedor.Handle)
 }

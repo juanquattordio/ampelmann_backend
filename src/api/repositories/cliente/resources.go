@@ -12,6 +12,7 @@ const (
 	saveScriptMySQL = "INSERT INTO Cliente(cuit, nombre, ubicacion, email, status)" +
 		"VALUES(?, ?, ?, ?, ?) "
 	selectScriptMySQL = "SELECT idCliente, cuit, nombre, ubicacion, email, status FROM Cliente"
+	updateScriptMySQL = "UPDATE Cliente SET cuit = ?, nombre = ?, ubicacion = ?, email = ?, status = ? WHERE idCliente = ?"
 )
 
 type cliente struct {

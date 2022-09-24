@@ -1,4 +1,4 @@
-package create_cliente
+package update_cliente
 
 import (
 	"fmt"

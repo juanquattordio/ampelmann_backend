@@ -1,4 +1,4 @@
-package create_proveedor
+package update_proveedor
 
 import (
 	"fmt"

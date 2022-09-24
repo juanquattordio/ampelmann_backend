@@ -57,7 +57,7 @@ func (r *Repository) Update(insumo *entities.Insumo) error {
 	if err != nil {
 		return err
 	}
-	_, err = stmt.Exec(insumo.Nombre, insumo.Stock, insumo.Status)
+	_, err = stmt.Exec(insumo.Nombre, insumo.Stock, insumo.Status, insumo.IdInsumo)
 	if err != nil {
 		return err
 	}
