@@ -37,8 +37,8 @@ func (r *Repository) Save(deposito entities.Deposito) error {
 func (r *Repository) GetLastID() (int64, error) {
 	return LastIdDeposito, nil
 }
-func (r *Repository) Search(id *int64, cuit *string) (*entities.Deposito, error) {
-	whereConditions, args := buildSearchWhere(id, cuit)
+func (r *Repository) Search(id *int64, descripcion *string) (*entities.Deposito, error) {
+	whereConditions, args := buildSearchWhere(id, descripcion)
 	searchScript := selectScriptMySQL + whereConditions
 	dbDeposito := new(deposito)
 

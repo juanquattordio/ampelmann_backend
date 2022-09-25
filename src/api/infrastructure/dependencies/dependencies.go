@@ -6,6 +6,7 @@ import (
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/create_deposito"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/create_insumo"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/create_proveedor"
+	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/get_stock"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/search_cliente"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/search_insumo"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/search_proveedor"
@@ -19,6 +20,7 @@ import (
 	"github.com/juanquattordio/ampelmann_backend/src/api/repositories/deposito"
 	"github.com/juanquattordio/ampelmann_backend/src/api/repositories/insumo"
 	"github.com/juanquattordio/ampelmann_backend/src/api/repositories/proveedor"
+	"github.com/juanquattordio/ampelmann_backend/src/api/repositories/stock"
 )
 
 type HandlerContainer struct {
@@ -31,6 +33,7 @@ type HandlerContainer struct {
 	CreateInsumo    entrypoints.Handler
 	SearchInsumo    entrypoints.Handler
 	UpdateInsumo    entrypoints.Handler
+	GetStock        entrypoints.Handler
 	CreateDeposito  entrypoints.Handler
 	UpdateDeposito  entrypoints.Handler
 }
@@ -45,6 +48,7 @@ func Start() *HandlerContainer {
 	proveedorRepository := proveedor.NewRepository(DB)
 	insumoRepository := insumo.NewRepository(DB)
 	depositoRepository := deposito.NewRepository(DB)
+	stockRepository := stock.NewRepository(DB)
 
 	// Use Cases
 	createClienteUseCase := &create_cliente.Implementation{
@@ -73,6 +77,11 @@ func Start() *HandlerContainer {
 	}
 	updateInsumoUseCase := &update_insumo.Implementation{
 		InsumoProvider: insumoRepository,
+	}
+	getStockUseCase := &get_stock.Implementation{
+		InsumoProvider:   insumoRepository,
+		DepositoProvider: depositoRepository,
+		StockProvider:    stockRepository,
 	}
 	createDepositoUseCase := &create_deposito.Implementation{
 		DepositoProvider: depositoRepository,
@@ -109,6 +118,9 @@ func Start() *HandlerContainer {
 	}
 	handlers.UpdateInsumo = &api.UpdateInsumo{
 		UpdateInsumoUseCase: updateInsumoUseCase,
+	}
+	handlers.GetStock = &api.GetStock{
+		GetStockUseCase: getStockUseCase,
 	}
 	handlers.CreateDeposito = &api.CreateDeposito{
 		CreateDepositoUseCase: createDepositoUseCase,
