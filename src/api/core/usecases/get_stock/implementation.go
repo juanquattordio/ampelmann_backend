@@ -5,15 +5,14 @@ import (
 	"database/sql"
 	goErrors "errors"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/entities"
+	"github.com/juanquattordio/ampelmann_backend/src/api/core/errors"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/providers"
 )
 
 type Implementation struct {
 	InsumoProvider   providers.Insumo
 	DepositoProvider providers.Deposito
-	//InsumoRepo    insumo.Repository
-	//DepositoRepo  deposito.Repository
-	StockProvider providers.Stock
+	StockProvider    providers.Stock
 }
 
 var (
@@ -22,35 +21,41 @@ var (
 	ErrInternal         = goErrors.New("internal error")
 )
 
-func (uc *Implementation) Execute(ctx context.Context, idInsumo *int64, idDeposito *int64) (*entities.Insumo, *entities.Deposito, float64, error) {
+func (uc *Implementation) GetStockByInsumo(ctx context.Context, idInsumo *int64, idDeposito *int64) (*entities.Insumo, *entities.Deposito, error) {
 
 	// valida que exista la entidad a trabajar
 	insumoDB, err := uc.InsumoProvider.Search(idInsumo, nil)
 	if insumoDB == nil && goErrors.Is(err, sql.ErrNoRows) {
-		return nil, nil, 0, ErrNotFoundInsumo
+		return nil, nil, ErrNotFoundInsumo
 	}
 	depositoDB := new(entities.Deposito)
 	if idDeposito != nil {
 		depositoDB, err = uc.DepositoProvider.Search(idDeposito, nil)
 		if depositoDB == nil && goErrors.Is(err, sql.ErrNoRows) {
-			return nil, nil, 0, ErrNotFoundDeposito
+			return nil, nil, ErrNotFoundDeposito
 		}
 	}
 
-	stock, err := uc.StockProvider.GetStock(idInsumo, idDeposito)
-	return insumoDB, depositoDB, stock, err
-
-	//if idDeposito != nil {
-	//	var stockByInsumoList []stockByInsumo
-	//	var err error
-	//	stockByInsumoList, err = uc.StockProvider.GetStockDeposito(idDeposito)
-	//	return stockByInsumoList, err
-	//}
+	stock, err := uc.StockProvider.GetStockInsumo(idInsumo, idDeposito)
+	insumoDB.Stock = stock
+	return insumoDB, depositoDB, err
 
 }
 
-type stockByInsumo struct {
-	idInsumo int
-	nombre   string
-	stock    float64
+func (uc *Implementation) GetStockByDeposito(ctx context.Context, idDeposito *int64) (*entities.Deposito, []entities.Insumo, error) {
+	//depositoDB := new(entities.Deposito)
+	//var err error
+	//if idDeposito != nil { 	TODO Nunca va a llegar un idDeposito nil, se chequea con el validate en el handler.
+	depositoDB, err := uc.DepositoProvider.Search(idDeposito, nil)
+	if depositoDB == nil && goErrors.Is(err, sql.ErrNoRows) {
+		return nil, nil, ErrNotFoundDeposito
+	}
+	//}
+
+	insumos, err := uc.StockProvider.GetStockDeposito(idDeposito)
+	if err != nil {
+		return nil, nil, errors.NewInternalServer("Fallo en calculo de Stock de deposito")
+	}
+	return depositoDB, insumos, err
+	//return nil, nil, nil
 }

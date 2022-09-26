@@ -52,7 +52,7 @@ func (handler GetStock) handle(ctx *gin.Context) {
 
 	// caso de Stock por Insumo
 	if request.IdInsumo != nil {
-		insumo, deposito, stock, errors := handler.GetStockUseCase.Execute(ctx, request.IdInsumo, request.IdDeposito)
+		insumo, deposito, errors := handler.GetStockUseCase.GetStockByInsumo(ctx, request.IdInsumo, request.IdDeposito)
 		if errors != nil {
 			if goErrors.Is(errors, sql.ErrNoRows) {
 				ctx.JSON(404, web.NewResponse(404, nil, errors.Error()))
@@ -61,21 +61,21 @@ func (handler GetStock) handle(ctx *gin.Context) {
 			}
 			return
 		}
-		ctx.JSON(http.StatusOK, contracts.NewResponse(insumo, deposito, stock))
+		ctx.JSON(http.StatusOK, contracts.NewResponse(insumo, deposito))
+		return
 	}
 
 	// caso de Stock por depósito
-
-	//insumo, err := handler.SearchInsumo.Execute(ctx, request.IdInsumo, nil)
-	//stock, err := handler.GetStockUseCase.Execute(ctx, request.IdInsumo, request.IdDeposito)
-	//if err != nil {
-	//	if goErrors.Is(err, sql.ErrNoRows) {
-	//		ctx.JSON(404, web.NewResponse(404, nil, "Source not found"))
-	//	} else {
-	//		ctx.JSON(404, web.NewResponse(404, nil, err.Error()))
-	//	}
-	//	return
-	//}
-	//ctx.JSON(http.StatusOK, contracts.NewResponse(insumo, stock))
+	deposito, insumos, errors := handler.GetStockUseCase.GetStockByDeposito(ctx, request.IdDeposito)
+	if errors != nil {
+		if goErrors.Is(errors, sql.ErrNoRows) {
+			ctx.JSON(404, web.NewResponse(404, nil, errors.Error()))
+		} else {
+			ctx.JSON(404, web.NewResponse(404, nil, errors.Error()))
+		}
+		return
+	}
+	ctx.JSON(http.StatusOK, contracts.NewResponseByDeposito(deposito, insumos))
+	return
 
 }

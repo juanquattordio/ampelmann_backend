@@ -6,5 +6,6 @@ import (
 )
 
 type UseCase interface {
-	Execute(context context.Context, idInsumo *int64, idDeposito *int64) (*entities.Insumo, *entities.Deposito, float64, error)
+	GetStockByInsumo(context context.Context, idInsumo *int64, idDeposito *int64) (*entities.Insumo, *entities.Deposito, error)
+	GetStockByDeposito(context context.Context, idDeposito *int64) (*entities.Deposito, []entities.Insumo, error)
 }

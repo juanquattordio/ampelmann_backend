@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	goErrors "errors"
 	"github.com/jmoiron/sqlx"
+	"github.com/juanquattordio/ampelmann_backend/src/api/core/entities"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/providers"
 	"strings"
 )
@@ -19,9 +20,9 @@ func NewRepository(db *sqlx.DB) providers.Stock {
 	return &repo
 }
 
-func (r *Repository) GetStock(idInsumo *int64, idDeposito *int64) (float64, error) {
+func (r *Repository) GetStockInsumo(idInsumo *int64, idDeposito *int64) (float64, error) {
 	if idDeposito == nil {
-		dbStock := new(stock)
+		dbStock := new(stockInsumo)
 		rows, err := r.db.Query(sumStockByInsumo, idInsumo)
 		if err != nil {
 			return 0, err
@@ -30,15 +31,12 @@ func (r *Repository) GetStock(idInsumo *int64, idDeposito *int64) (float64, erro
 			_ = rows.Scan(&dbStock.IdInsumo, &dbStock.Stock)
 		}
 		return dbStock.Stock, nil
-
-	} else if idInsumo == nil {
-		// caso de stock por depósito
 	}
 
-	// caso de stock por insumo y deposito
+	// caso de stockInsumo por insumo y deposito
 	whereConditions, args := buildSearchWhere(idInsumo, idDeposito)
-	stockScript := selectScriptMySQL + whereConditions
-	dbStock := new(stock)
+	stockScript := getStockInsumoDeposito + whereConditions
+	dbStock := new(stockInsumo)
 
 	err := r.db.Get(dbStock, stockScript, args...)
 
@@ -49,8 +47,25 @@ func (r *Repository) GetStock(idInsumo *int64, idDeposito *int64) (float64, erro
 		return 0, err
 	}
 
-	//stockResult := dbStock.toEntity()
 	return dbStock.Stock, nil
+
+}
+
+func (r *Repository) GetStockDeposito(idDeposito *int64) ([]entities.Insumo, error) {
+
+	rows, err := r.db.Query(getStockByDeposito, idDeposito)
+	if err != nil && !goErrors.Is(err, sql.ErrNoRows) {
+		return nil, err
+	}
+	var insumos []entities.Insumo
+	for rows.Next() {
+		insumoDB := new(stockDeposito)
+		_ = rows.Scan(&insumoDB.IdDeposito, &insumoDB.IdInsumo, &insumoDB.NombreInsumo, &insumoDB.Stock)
+		insumo := insumoDB.toEntity()
+		insumos = append(insumos, insumo)
+	}
+
+	return insumos, nil
 
 }
 
