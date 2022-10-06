@@ -26,6 +26,7 @@ func configureAPIMappings(router *gin.Engine, handlers *dependencies.HandlerCont
 	insumos.PATCH("/:id", handlers.UpdateInsumo.Handle)
 	insumos.PATCH("/:id/cancel", handlers.UpdateInsumo.Handle)
 	insumos.GET("/stock", handlers.GetStock.Handle)
+	insumos.POST("movimiento/create", handlers.CreateMovimientoDeposito.Handle)
 
 	// Proveedores endpoints
 	proveedores := ampelmannGroup.Group("/proveedores")

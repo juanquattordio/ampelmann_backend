@@ -43,19 +43,15 @@ func (uc *Implementation) GetStockByInsumo(ctx context.Context, idInsumo *int64,
 }
 
 func (uc *Implementation) GetStockByDeposito(ctx context.Context, idDeposito *int64) (*entities.Deposito, []entities.Insumo, error) {
-	//depositoDB := new(entities.Deposito)
-	//var err error
-	//if idDeposito != nil { 	TODO Nunca va a llegar un idDeposito nil, se chequea con el validate en el handler.
+	//TODO Nunca va a llegar un idDeposito nil, se chequea con el validate en el handler.
 	depositoDB, err := uc.DepositoProvider.Search(idDeposito, nil)
 	if depositoDB == nil && goErrors.Is(err, sql.ErrNoRows) {
 		return nil, nil, ErrNotFoundDeposito
 	}
-	//}
 
-	insumos, err := uc.StockProvider.GetStockDeposito(idDeposito)
+	insumos, err := uc.StockProvider.GetStockDeposito(ctx, idDeposito)
 	if err != nil {
 		return nil, nil, errors.NewInternalServer("Fallo en calculo de Stock de deposito")
 	}
 	return depositoDB, insumos, err
-	//return nil, nil, nil
 }

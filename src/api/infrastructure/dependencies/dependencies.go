@@ -7,6 +7,7 @@ import (
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/create_insumo"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/create_proveedor"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/get_stock"
+	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/movimiento_depositos"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/search_cliente"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/search_insumo"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/search_proveedor"
@@ -16,6 +17,7 @@ import (
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/update_proveedor"
 	"github.com/juanquattordio/ampelmann_backend/src/api/entrypoints"
 	"github.com/juanquattordio/ampelmann_backend/src/api/entrypoints/handlers/api"
+	"github.com/juanquattordio/ampelmann_backend/src/api/repositories/administracion/documento"
 	"github.com/juanquattordio/ampelmann_backend/src/api/repositories/cliente"
 	"github.com/juanquattordio/ampelmann_backend/src/api/repositories/deposito"
 	"github.com/juanquattordio/ampelmann_backend/src/api/repositories/insumo"
@@ -24,18 +26,19 @@ import (
 )
 
 type HandlerContainer struct {
-	CreateCliente   entrypoints.Handler
-	SearchCliente   entrypoints.Handler
-	UpdateCliente   entrypoints.Handler
-	CreateProveedor entrypoints.Handler
-	SearchProveedor entrypoints.Handler
-	UpdateProveedor entrypoints.Handler
-	CreateInsumo    entrypoints.Handler
-	SearchInsumo    entrypoints.Handler
-	UpdateInsumo    entrypoints.Handler
-	GetStock        entrypoints.Handler
-	CreateDeposito  entrypoints.Handler
-	UpdateDeposito  entrypoints.Handler
+	CreateCliente            entrypoints.Handler
+	SearchCliente            entrypoints.Handler
+	UpdateCliente            entrypoints.Handler
+	CreateProveedor          entrypoints.Handler
+	SearchProveedor          entrypoints.Handler
+	UpdateProveedor          entrypoints.Handler
+	CreateInsumo             entrypoints.Handler
+	SearchInsumo             entrypoints.Handler
+	UpdateInsumo             entrypoints.Handler
+	GetStock                 entrypoints.Handler
+	CreateDeposito           entrypoints.Handler
+	UpdateDeposito           entrypoints.Handler
+	CreateMovimientoDeposito entrypoints.Handler
 }
 
 func Start() *HandlerContainer {
@@ -48,7 +51,8 @@ func Start() *HandlerContainer {
 	proveedorRepository := proveedor.NewRepository(DB)
 	insumoRepository := insumo.NewRepository(DB)
 	depositoRepository := deposito.NewRepository(DB)
-	stockRepository := stock.NewRepository(DB)
+	documentosRepository := documento.NewRepository(DB)
+	stockRepository := stock.NewRepository(DB, documentosRepository)
 
 	// Use Cases
 	createClienteUseCase := &create_cliente.Implementation{
@@ -89,6 +93,10 @@ func Start() *HandlerContainer {
 	updateDepositoUseCase := &update_deposito.Implementation{
 		DepositoProvider: depositoRepository,
 	}
+	movimientoDepositoUseCase := &movimiento_depositos.Implementation{
+		DepositoProvider: depositoRepository,
+		StockProvider:    stockRepository,
+	}
 
 	// API handlers
 	handlers := HandlerContainer{}
@@ -127,6 +135,9 @@ func Start() *HandlerContainer {
 	}
 	handlers.UpdateDeposito = &api.UpdateDeposito{
 		UpdateDepositoUseCase: updateDepositoUseCase,
+	}
+	handlers.CreateMovimientoDeposito = &api.CreateMovimientoDeposito{
+		CreateMovimientoDepositoUseCase: movimientoDepositoUseCase,
 	}
 
 	return &handlers

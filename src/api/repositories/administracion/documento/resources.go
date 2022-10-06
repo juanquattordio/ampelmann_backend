@@ -1,4 +1,4 @@
-package stock
+package documento
 
 import "github.com/juanquattordio/ampelmann_backend/src/api/core/entities"
 
@@ -7,10 +7,7 @@ const (
 )
 
 const (
-	getStockInsumoDeposito = "SELECT id_insumo, id_deposito, stock FROM Stock_Insumo"
-	sumStockByInsumo       = "SELECT id_insumo, SUM(stock) as 'stock' from Stock_Insumo GROUP BY id_insumo HAVING id_insumo = ?"
-	getStockByDeposito     = "select id_deposito, id_insumo, i.nombre as 'nombre', Stock_Insumo.stock as 'stock' from Stock_Insumo INNER JOIN Insumo i ON id_insumo = i.idInsumo WHERE id_deposito= ?"
-	updateStock            = "call updateStock(?,?,?)" // llama al procedure/procedimiento creado en la BD
+	insertMovInsumoHeader = "INSERT INTO Movimiento_Insumos_Header (idDeposito_Origen, idDeposito_Destino, fecha) VALUES(?,?,?)"
 )
 
 type stockInsumo struct {
