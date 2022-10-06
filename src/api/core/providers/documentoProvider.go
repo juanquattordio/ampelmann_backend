@@ -6,5 +6,6 @@ import (
 )
 
 type Documento interface {
-	CreateMovimientoDepositos(tx *sqlx.Tx, movimiento *entities.MovimientoHeader) error
+	CreateHeaderMovimientoDepositos(tx *sqlx.Tx, movimiento *entities.MovimientoHeader) (int64, error)
+	CreateLineMovimientoDepositos(tx *sqlx.Tx, idHeader int64, idLinea int, idInsumo *int64, cantidad *float64, observaciones *string) error
 }

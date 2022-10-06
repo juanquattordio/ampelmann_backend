@@ -8,6 +8,7 @@ const (
 
 const (
 	insertMovInsumoHeader = "INSERT INTO Movimiento_Insumos_Header (idDeposito_Origen, idDeposito_Destino, fecha) VALUES(?,?,?)"
+	insertMovInsumoLine   = "INSERT INTO Movimiento_Insumos_Line (idMovimiento, idLinea, idInsumo, cantidad, observaciones) VALUES(?,?,?,?,?)"
 )
 
 type stockInsumo struct {

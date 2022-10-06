@@ -74,20 +74,26 @@ func (r *Repository) GetStockDeposito(ctx context.Context, idDeposito *int64) ([
 func (r *Repository) MovimientoDepositos(ctx context.Context, header *entities.MovimientoHeader) error {
 	tx := r.db.MustBegin()
 	var err error
+	var idHeader int64
 
 	// inserta header en tabla
-	if err = r.documentoProvider.CreateMovimientoDepositos(tx, header); err != nil {
+	if idHeader, err = r.documentoProvider.CreateHeaderMovimientoDepositos(tx, header); err != nil {
 		if errRollBack := tx.Rollback(); errRollBack != nil {
 			return errors.NewInternalServer("Fallo en el rollback de la transacción")
 		}
 		return errors.NewInternalServer("Fallo en crear header movimiento insumos. Se hace rollback")
 	}
 
-	for _, linea := range header.Lineas {
+	// por cada linea del comprobante se actualiza stocks e inserta linea de comprobante en tabla
+	for i, linea := range header.Lineas {
 		if err = r.UpdateStock(tx, &linea.IdInsumo, &header.IdDepositoOrigen, -(linea.Cantidad)); err != nil {
 			break
 		}
 		if err = r.UpdateStock(tx, &linea.IdInsumo, &header.IdDepositoDestino, linea.Cantidad); err != nil {
+			break
+		}
+		if err = r.documentoProvider.CreateLineMovimientoDepositos(tx, idHeader, i, &linea.IdInsumo, &linea.Cantidad,
+			&linea.Obseraciones); err != nil {
 			break
 		}
 	}
