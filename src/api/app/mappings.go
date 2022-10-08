@@ -40,4 +40,8 @@ func configureAPIMappings(router *gin.Engine, handlers *dependencies.HandlerCont
 	depositos.POST("", handlers.CreateDeposito.Handle)
 	depositos.PATCH("/:id", handlers.UpdateDeposito.Handle)
 	depositos.PATCH("/:id/cancel", handlers.UpdateDeposito.Handle)
+
+	// Facturas
+	facturasCompra := ampelmannGroup.Group("/facturas-compra")
+	facturasCompra.POST("/create", handlers.CreateFacturaCompra.Handle)
 }

@@ -7,8 +7,10 @@ const (
 )
 
 const (
-	insertMovInsumoHeader = "INSERT INTO Movimiento_Insumos_Header (idDeposito_Origen, idDeposito_Destino, fecha) VALUES(?,?,?)"
-	insertMovInsumoLine   = "INSERT INTO Movimiento_Insumos_Line (idMovimiento, idLinea, idInsumo, cantidad, observaciones) VALUES(?,?,?,?,?)"
+	insertMovInsumoHeader     = "INSERT INTO Movimiento_Insumos_Header (idDeposito_Origen, idDeposito_Destino, fecha) VALUES(?,?,?)"
+	insertMovInsumoLine       = "INSERT INTO Movimiento_Insumos_Line (idMovimiento, idLinea, idInsumo, cantidad, observaciones) VALUES(?,?,?,?,?)"
+	insertFacturaCompraHeader = "INSERT INTO Compra_Factura_Header (id_proveedor, id_factura_proveedor, fecha_origen, fecha, importe_total) VALUES(?,?,?,?,?)"
+	insertFacturaCompraLine   = "INSERT INTO Compra_Factura_Line (id_factura, id_linea, id_insumo, cantidad, precio_unitario, observaciones) VALUES(?,?,?,?,?,?)"
 )
 
 type stockInsumo struct {

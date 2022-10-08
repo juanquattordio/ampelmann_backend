@@ -6,6 +6,7 @@ import (
 )
 
 type MovimientoHeader struct {
+	IdHeader          int64
 	Fecha             time.Time
 	IdDepositoOrigen  int64
 	IdDepositoDestino int64
@@ -14,6 +15,7 @@ type MovimientoHeader struct {
 }
 
 type MovimientoLine struct {
+	IdLinea      int64
 	IdInsumo     int64
 	Cantidad     float64
 	Obseraciones string

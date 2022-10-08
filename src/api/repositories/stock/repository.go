@@ -83,6 +83,7 @@ func (r *Repository) MovimientoDepositos(ctx context.Context, header *entities.M
 		}
 		return errors.NewInternalServer("Fallo en crear header movimiento insumos. Se hace rollback")
 	}
+	header.IdHeader = idHeader
 
 	// por cada linea del comprobante se actualiza stocks e inserta linea de comprobante en tabla
 	for i, linea := range header.Lineas {
@@ -96,6 +97,7 @@ func (r *Repository) MovimientoDepositos(ctx context.Context, header *entities.M
 			&linea.Obseraciones); err != nil {
 			break
 		}
+		header.Lineas[i].IdLinea = int64(i + 1)
 	}
 	if err != nil {
 		if errRollBack := tx.Rollback(); errRollBack != nil {

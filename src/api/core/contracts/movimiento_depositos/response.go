@@ -6,6 +6,7 @@ import (
 )
 
 type Response struct {
+	IdHeader          *int64    `form:"id_header" json:"id_header"`
 	Fecha             time.Time `form:"fecha" json:"fecha"`
 	IdDepositoOrigen  *int64    `form:"id_deposito_origen" json:"id_deposito_origen"`
 	IdDepositoDestino *int64    `form:"id_deposito_destino" json:"id_deposito_destino"`
@@ -16,11 +17,13 @@ type Response struct {
 func NewResponse(movimiento *entities.MovimientoHeader) *Response {
 	insumos := make([]Insumo, len(movimiento.Lineas))
 	for i := range movimiento.Lineas {
+		insumos[i].IdLinea = &movimiento.Lineas[i].IdLinea
 		insumos[i].IdInsumo = &movimiento.Lineas[i].IdInsumo
 		insumos[i].Cantidad = &movimiento.Lineas[i].Cantidad
 		insumos[i].Obseraciones = movimiento.Lineas[i].Obseraciones
 	}
 	return &Response{
+		IdHeader:          &movimiento.IdHeader,
 		Fecha:             movimiento.Fecha,
 		IdDepositoOrigen:  &movimiento.IdDepositoOrigen,
 		IdDepositoDestino: &movimiento.IdDepositoDestino,

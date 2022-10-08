@@ -4,6 +4,7 @@ import (
 	"github.com/juanquattordio/ampelmann_backend/src/api/config/db"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/create_cliente"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/create_deposito"
+	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/create_factura_compra"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/create_insumo"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/create_proveedor"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/get_stock"
@@ -39,6 +40,7 @@ type HandlerContainer struct {
 	CreateDeposito           entrypoints.Handler
 	UpdateDeposito           entrypoints.Handler
 	CreateMovimientoDeposito entrypoints.Handler
+	CreateFacturaCompra      entrypoints.Handler
 }
 
 func Start() *HandlerContainer {
@@ -97,6 +99,11 @@ func Start() *HandlerContainer {
 		DepositoProvider: depositoRepository,
 		StockProvider:    stockRepository,
 	}
+	createFacturaCompraUseCase := &create_factura_compra.Implementation{
+		ProveedorProvider: proveedorRepository,
+		DocumentoProvider: documentosRepository,
+		InsumoProvider:    insumoRepository,
+	}
 
 	// API handlers
 	handlers := HandlerContainer{}
@@ -138,6 +145,9 @@ func Start() *HandlerContainer {
 	}
 	handlers.CreateMovimientoDeposito = &api.CreateMovimientoDeposito{
 		CreateMovimientoDepositoUseCase: movimientoDepositoUseCase,
+	}
+	handlers.CreateFacturaCompra = &api.CreateFacturaCompra{
+		CreateFacturaCompraUseCase: createFacturaCompraUseCase,
 	}
 
 	return &handlers
