@@ -103,6 +103,7 @@ func Start() *HandlerContainer {
 		ProveedorProvider: proveedorRepository,
 		DocumentoProvider: documentosRepository,
 		InsumoProvider:    insumoRepository,
+		StockProvider:     stockRepository,
 	}
 
 	// API handlers

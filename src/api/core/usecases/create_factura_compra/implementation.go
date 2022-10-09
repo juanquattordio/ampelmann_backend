@@ -15,6 +15,7 @@ type Implementation struct {
 	ProveedorProvider providers.Proveedor
 	DocumentoProvider providers.Documento
 	InsumoProvider    providers.Insumo
+	StockProvider     providers.Stock
 }
 
 var (
@@ -41,7 +42,14 @@ func (uc *Implementation) Execute(ctx context.Context, request create_factura_co
 	newFactura := entities.NewFacturaCompra(*request.IdProveedor, *request.IdFacturaProveedor, time.Time(request.FechaOrigen), toEntities(request.Lineas))
 
 	if err = uc.DocumentoProvider.CreateFacturaCompra(newFactura); err != nil {
-		return nil, ErrInternal
+		return nil, goErrors.New(fmt.Sprintf("fallo en la creación de la factura"))
+	}
+
+	// Crea un movimiento que ejecuta Updates de stocks en cada depósito
+	idDepositoInsumos := int64(2)
+	movimiento := entities.NewMovimientoDeposito(0, idDepositoInsumos, parseToMovLines(request.Lineas))
+	if err = uc.StockProvider.MovimientoDepositos(ctx, movimiento); err != nil {
+		return nil, goErrors.New(fmt.Sprintf("fallo en la creación del movimiento de insumos por compra"))
 	}
 
 	return newFactura, nil
@@ -54,6 +62,18 @@ func toEntities(linesRequest []create_factura_compra.FacturaCompraLine) []entiti
 		line.IdInsumo = *lineReq.IdInsumo
 		line.Cantidad = *lineReq.Cantidad
 		line.PrecioUnitario = *lineReq.PrecioUnitario
+		line.Obseraciones = lineReq.Obseraciones
+		lineas = append(lineas, *line)
+	}
+	return lineas
+}
+
+func parseToMovLines(linesRequest []create_factura_compra.FacturaCompraLine) []entities.MovimientoLine {
+	var lineas []entities.MovimientoLine
+	for _, lineReq := range linesRequest {
+		line := new(entities.MovimientoLine)
+		line.IdInsumo = *lineReq.IdInsumo
+		line.Cantidad = *lineReq.Cantidad
 		line.Obseraciones = lineReq.Obseraciones
 		lineas = append(lineas, *line)
 	}
