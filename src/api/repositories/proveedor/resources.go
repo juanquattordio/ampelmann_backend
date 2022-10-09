@@ -2,6 +2,7 @@ package proveedor
 
 import (
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/entities"
+	"time"
 )
 
 const (
@@ -11,8 +12,15 @@ const (
 const (
 	saveScriptMySQL = "INSERT INTO Proveedor(cuit, nombre, ubicacion, pagina_web, status)" +
 		"VALUES(?, ?, ?, ?, ?) "
-	selectScriptMySQL = "SELECT idProveedor, cuit, nombre, ubicacion, pagina_web, status FROM Proveedor"
-	updateScriptMySQL = "UPDATE Proveedor SET cuit = ?, nombre = ?, ubicacion = ?, pagina_web = ?, status = ? WHERE idProveedor = ?"
+	selectScriptMySQL  = "SELECT idProveedor, cuit, nombre, ubicacion, pagina_web, status FROM Proveedor"
+	updateScriptMySQL  = "UPDATE Proveedor SET cuit = ?, nombre = ?, ubicacion = ?, pagina_web = ?, status = ? WHERE idProveedor = ?"
+	insertPriceUpdated = `
+		INSERT INTO Proveedores_Insumos (
+			idProveedor, idInsumo, precio, fecha, status
+		) VALUES (
+		  	:idProveedor, :idInsumo, :precio, :fecha, :status
+		)
+		 ON DUPLICATE KEY UPDATE precio = VALUES(precio), fecha = VALUES(fecha)`
 )
 
 type proveedor struct {
@@ -43,5 +51,23 @@ func (dbItem proveedor) toEntity() *entities.Proveedor {
 		Ubicacion: dbItem.Ubicacion,
 		PaginaWeb: dbItem.PaginaWeb,
 		Status:    dbItem.Status,
+	}
+}
+
+type precioInsumoProveedor struct {
+	IdProveedor int64     `db:"idProveedor"`
+	IdInsumo    int64     `db:"idInsumo"`
+	Precio      float64   `db:"precio"`
+	Fecha       time.Time `db:"fecha"`
+	Status      string    `db:"status"`
+}
+
+func newHistorialPrecioInsumo(idProveedor *int64, idInsumo *int64, precioUnitario *float64, fecha time.Time) precioInsumoProveedor {
+	return precioInsumoProveedor{
+		IdProveedor: *idProveedor,
+		IdInsumo:    *idInsumo,
+		Precio:      *precioUnitario,
+		Fecha:       fecha,
+		Status:      "activo",
 	}
 }

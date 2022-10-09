@@ -5,6 +5,7 @@ import (
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/entities"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/providers"
 	"strings"
+	"time"
 )
 
 type Repository struct {
@@ -51,20 +52,6 @@ func (r *Repository) Search(id *int64, cuit *string) (*entities.Proveedor, error
 	proveedorResult := dbProveedor.toEntity()
 	return proveedorResult, nil
 }
-
-func buildSearchWhere(id *int64, cuit *string) (query string, args []interface{}) {
-	if id != nil {
-		query += " AND idProveedor = ?"
-		args = append(args, id)
-	}
-	if cuit != nil && *cuit != "" {
-		query += " AND cuit = ?"
-		args = append(args, cuit)
-	}
-
-	return strings.Replace(query, " AND ", " WHERE ", 1), args
-}
-
 func (r *Repository) Update(proveedor *entities.Proveedor) error {
 
 	stmt, err := r.db.Prepare(updateScriptMySQL)
@@ -77,4 +64,30 @@ func (r *Repository) Update(proveedor *entities.Proveedor) error {
 	}
 
 	return nil
+}
+func (r *Repository) UpdateHistorialPrecioInsumo(idProveedor *int64, idInsumo *int64, precioUnitario *float64, fecha time.Time) error {
+	//stmt, err := r.db.Prepare(updateScriptMySQL)
+	historialToSave := newHistorialPrecioInsumo(idProveedor, idInsumo, precioUnitario, fecha)
+	//if err != nil {
+	//	return err
+	//}
+	_, err := r.db.NamedExec(insertPriceUpdated, historialToSave)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func buildSearchWhere(id *int64, cuit *string) (query string, args []interface{}) {
+	if id != nil {
+		query += " AND idProveedor = ?"
+		args = append(args, id)
+	}
+	if cuit != nil && *cuit != "" {
+		query += " AND cuit = ?"
+		args = append(args, cuit)
+	}
+
+	return strings.Replace(query, " AND ", " WHERE ", 1), args
 }
