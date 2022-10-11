@@ -5,6 +5,7 @@ type Request struct {
 	IdDepositoDestino *int64   `form:"id_deposito_destino" json:"id_deposito_destino" binding:"required"`
 	Insumos           []Insumo `form:"insumos" json:"insumos" binding:"required"`
 	Status            *string  `form:"status" json:"status" binding:""`
+	CausaMovimiento   *string  `form:"causa_movimiento" json:"causa_movimiento" binding:""`
 }
 
 type Insumo struct {

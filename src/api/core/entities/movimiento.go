@@ -12,6 +12,7 @@ type MovimientoHeader struct {
 	IdDepositoDestino int64
 	Lineas            []MovimientoLine
 	Status            string
+	CausaMovimiento   string
 }
 
 type MovimientoLine struct {
@@ -21,13 +22,14 @@ type MovimientoLine struct {
 	Obseraciones string
 }
 
-func NewMovimientoDeposito(origen int64, destino int64, lineas []MovimientoLine) *MovimientoHeader {
+func NewMovimientoDeposito(origen int64, destino int64, lineas []MovimientoLine, causaMovimiento string) *MovimientoHeader {
 	movimientoHeader := &MovimientoHeader{
 		Fecha:             time.Now().UTC(),
 		IdDepositoOrigen:  origen,
 		IdDepositoDestino: destino,
 		Lineas:            lineas,
 		Status:            constants.Activo,
+		CausaMovimiento:   causaMovimiento,
 	}
 
 	return movimientoHeader

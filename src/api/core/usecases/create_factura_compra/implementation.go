@@ -53,7 +53,8 @@ func (uc *Implementation) Execute(ctx context.Context, request create_factura_co
 
 	// Crea un movimiento que ejecuta Updates de stocks en cada depósito
 	idDepositoInsumos := int64(2)
-	movimiento := entities.NewMovimientoDeposito(0, idDepositoInsumos, parseToMovLines(request.Lineas))
+	causaMovimiento := fmt.Sprintf("FCP-%d", newFactura.IdFactura)
+	movimiento := entities.NewMovimientoDeposito(0, idDepositoInsumos, parseToMovLines(request.Lineas), causaMovimiento)
 	if err = uc.StockProvider.MovimientoDepositos(ctx, movimiento); err != nil {
 		return nil, goErrors.New(fmt.Sprintf("fallo en la creación del movimiento de insumos por compra"))
 	}

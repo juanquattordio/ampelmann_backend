@@ -24,14 +24,14 @@ func (r *Repository) CreateHeaderMovimientoDepositos(tx *sqlx.Tx, movimiento *en
 	var idHeader int64
 	if tx == nil {
 		stmt, err := r.db.Prepare(insertMovInsumoHeader)
-		result, err := stmt.Exec(&movimiento.IdDepositoOrigen, &movimiento.IdDepositoDestino, &movimiento.Fecha)
+		result, err := stmt.Exec(&movimiento.IdDepositoOrigen, &movimiento.IdDepositoDestino, &movimiento.Fecha, movimiento.CausaMovimiento)
 		if err != nil {
 			return 0, errors.NewInternalServer("Fallo al crear documento")
 		}
 		idHeader, err = result.LastInsertId()
 	} else {
 		stmt, err := tx.Prepare(insertMovInsumoHeader)
-		result, err := stmt.Exec(&movimiento.IdDepositoOrigen, &movimiento.IdDepositoDestino, &movimiento.Fecha)
+		result, err := stmt.Exec(&movimiento.IdDepositoOrigen, &movimiento.IdDepositoDestino, &movimiento.Fecha, movimiento.CausaMovimiento)
 		if err != nil {
 			return 0, errors.NewInternalServer("Fallo al crear documento")
 		}

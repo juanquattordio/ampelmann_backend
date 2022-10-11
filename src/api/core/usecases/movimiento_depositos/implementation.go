@@ -44,7 +44,13 @@ func (uc *Implementation) Execute(ctx context.Context, req movimiento_depositos.
 	}
 
 	// Crea un movimiento que ejecuta Updates de stocks en cada depósito
-	movimiento := entities.NewMovimientoDeposito(*req.IdDepositoOrigen, *req.IdDepositoDestino, toEntities(req.Insumos))
+	var causaMovimiento string
+	if req.CausaMovimiento == nil || *req.CausaMovimiento == "" {
+		causaMovimiento = "Ajuste stock"
+	} else {
+		causaMovimiento = *req.CausaMovimiento
+	}
+	movimiento := entities.NewMovimientoDeposito(*req.IdDepositoOrigen, *req.IdDepositoDestino, toEntities(req.Insumos), causaMovimiento)
 	err = uc.StockProvider.MovimientoDepositos(ctx, movimiento)
 
 	if err != nil {

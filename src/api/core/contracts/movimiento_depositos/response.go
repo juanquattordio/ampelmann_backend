@@ -10,6 +10,7 @@ type Response struct {
 	Fecha             time.Time `form:"fecha" json:"fecha"`
 	IdDepositoOrigen  *int64    `form:"id_deposito_origen" json:"id_deposito_origen"`
 	IdDepositoDestino *int64    `form:"id_deposito_destino" json:"id_deposito_destino"`
+	CausaMovimiento   string    `form:"causa_movimiento" json:"causa_movimiento"`
 	Insumos           []Insumo  `form:"insumos" json:"insumos"`
 	Status            *string   `form:"status" json:"status"`
 }
@@ -27,6 +28,7 @@ func NewResponse(movimiento *entities.MovimientoHeader) *Response {
 		Fecha:             movimiento.Fecha,
 		IdDepositoOrigen:  &movimiento.IdDepositoOrigen,
 		IdDepositoDestino: &movimiento.IdDepositoDestino,
+		CausaMovimiento:   movimiento.CausaMovimiento,
 		Insumos:           insumos,
 		Status:            &movimiento.Status,
 	}
