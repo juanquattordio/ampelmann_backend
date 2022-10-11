@@ -12,6 +12,7 @@ import (
 
 type Implementation struct {
 	DepositoProvider providers.Deposito
+	StockProvider    providers.Stock
 }
 
 var (
@@ -35,6 +36,15 @@ func (uc *Implementation) Execute(ctx context.Context, id int64, request update_
 	}
 	if err != nil {
 		return depositoDB, err
+	}
+
+	// Si el deposito contiene stock, no permite desactivarlo sin antes mover los insumos
+	insumos, err := uc.StockProvider.GetStockDeposito(ctx, &depositoDB.ID)
+	if err != nil {
+		return nil, err
+	}
+	if len(insumos) > 0 && depositoDB.Status == constants.Desactivo {
+		return nil, goErrors.New("El deposito contiene stock. Para desactivarlo, antes mover los insumos")
 	}
 
 	err = uc.DepositoProvider.Update(depositoDB)

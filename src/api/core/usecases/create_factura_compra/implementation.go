@@ -38,7 +38,8 @@ func (uc *Implementation) Execute(ctx context.Context, request create_factura_co
 			return nil, goErrors.New(fmt.Sprintf("id_proveedor %d not found", linea.IdInsumo))
 		}
 		// Carga historial de precio por insumo y proveedor
-		err = uc.ProveedorProvider.UpdateHistorialPrecioInsumo(request.IdProveedor, linea.IdInsumo, linea.PrecioUnitario, time.Time(request.FechaOrigen))
+		err = uc.ProveedorProvider.UpdateHistorialPrecioInsumo(request.IdProveedor, linea.IdInsumo,
+			linea.PrecioUnitario, time.Time(request.FechaOrigen), "")
 		if err != nil {
 			return nil, goErrors.New(fmt.Sprintf("Error al actualizar historial de precios"))
 		}

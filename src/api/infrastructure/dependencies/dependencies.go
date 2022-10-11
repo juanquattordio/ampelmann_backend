@@ -14,6 +14,7 @@ import (
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/search_proveedor"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/update_cliente"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/update_deposito"
+	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/update_historial_precios_proveedor"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/update_insumo"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/update_proveedor"
 	"github.com/juanquattordio/ampelmann_backend/src/api/entrypoints"
@@ -33,6 +34,7 @@ type HandlerContainer struct {
 	CreateProveedor          entrypoints.Handler
 	SearchProveedor          entrypoints.Handler
 	UpdateProveedor          entrypoints.Handler
+	UpdateHistorial          entrypoints.Handler
 	CreateInsumo             entrypoints.Handler
 	SearchInsumo             entrypoints.Handler
 	UpdateInsumo             entrypoints.Handler
@@ -50,8 +52,8 @@ func Start() *HandlerContainer {
 
 	// Repositories
 	clienteRepository := cliente.NewRepository(DB)
-	proveedorRepository := proveedor.NewRepository(DB)
 	insumoRepository := insumo.NewRepository(DB)
+	proveedorRepository := proveedor.NewRepository(DB, insumoRepository)
 	depositoRepository := deposito.NewRepository(DB)
 	documentosRepository := documento.NewRepository(DB)
 	stockRepository := stock.NewRepository(DB, documentosRepository)
@@ -75,6 +77,9 @@ func Start() *HandlerContainer {
 	updateProveedorUseCase := &update_proveedor.Implementation{
 		ProveedorProvider: proveedorRepository,
 	}
+	updateHistorialPreciosProveedorUseCase := &update_historial_precios_proveedor.Implementation{
+		ProveedorProvider: proveedorRepository,
+	}
 	createInsumoUseCase := &create_insumo.Implementation{
 		InsumoProvider: insumoRepository,
 	}
@@ -94,6 +99,7 @@ func Start() *HandlerContainer {
 	}
 	updateDepositoUseCase := &update_deposito.Implementation{
 		DepositoProvider: depositoRepository,
+		StockProvider:    stockRepository,
 	}
 	movimientoDepositoUseCase := &movimiento_depositos.Implementation{
 		DepositoProvider: depositoRepository,
@@ -125,6 +131,9 @@ func Start() *HandlerContainer {
 	}
 	handlers.UpdateProveedor = &api.UpdateProveedor{
 		UpdateProveedorUseCase: updateProveedorUseCase,
+	}
+	handlers.UpdateHistorial = &api.UpdateHistorialPreciosProveedor{
+		UpdateHistorialPreciosProveedor: updateHistorialPreciosProveedorUseCase,
 	}
 	handlers.CreateInsumo = &api.CreateInsumo{
 		CreateInsumoUseCase: createInsumoUseCase,

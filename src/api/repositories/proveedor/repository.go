@@ -1,20 +1,26 @@
 package proveedor
 
 import (
+	"database/sql"
+	goErrors "errors"
+	"fmt"
 	"github.com/jmoiron/sqlx"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/entities"
+	"github.com/juanquattordio/ampelmann_backend/src/api/core/entities/constants"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/providers"
 	"strings"
 	"time"
 )
 
 type Repository struct {
-	db *sqlx.DB
+	db             *sqlx.DB
+	insumoProvider providers.Insumo
 }
 
-func NewRepository(db *sqlx.DB) providers.Proveedor {
+func NewRepository(db *sqlx.DB, insumoProvider providers.Insumo) providers.Proveedor {
 	repo := Repository{
-		db: db,
+		db:             db,
+		insumoProvider: insumoProvider,
 	}
 	return &repo
 }
@@ -65,15 +71,39 @@ func (r *Repository) Update(proveedor *entities.Proveedor) error {
 
 	return nil
 }
-func (r *Repository) UpdateHistorialPrecioInsumo(idProveedor *int64, idInsumo *int64, precioUnitario *float64, fecha time.Time) error {
-	//stmt, err := r.db.Prepare(updateScriptMySQL)
-	historialToSave := newHistorialPrecioInsumo(idProveedor, idInsumo, precioUnitario, fecha)
-	//if err != nil {
-	//	return err
-	//}
-	_, err := r.db.NamedExec(insertPriceUpdated, historialToSave)
-	if err != nil {
-		return err
+func (r *Repository) UpdateHistorialPrecioInsumo(idProveedor *int64, idInsumo *int64,
+	precioUnitario *float64, fecha time.Time, status string) error {
+
+	// valida que exista el proveedor
+	proveedorExists, err := r.Search(idProveedor, nil)
+	if proveedorExists == nil || goErrors.Is(err, sql.ErrNoRows) {
+		return goErrors.New(fmt.Sprintf("id_proveedor %d not found", *idProveedor))
+	}
+	// valida que existan los insumos comprados
+	productoExists, err := r.insumoProvider.Search(idInsumo, nil)
+	if err != nil || productoExists == nil || goErrors.Is(err, sql.ErrNoRows) {
+		return goErrors.New(fmt.Sprintf("id_insumo %d not found", idInsumo))
+	}
+
+	// valida que el status que se quiere insertar sea válido
+	if status == "" {
+		status = constants.Activo
+	} else {
+		if status != constants.Desactivo && status != constants.Activo {
+			return goErrors.New("status no valido")
+		}
+	}
+	historialToSave := newHistorialPrecioInsumo(idProveedor, idInsumo, precioUnitario, fecha, status)
+	if precioUnitario != nil {
+		_, err = r.db.NamedExec(insertPriceUpdated, historialToSave)
+		if err != nil {
+			return err
+		}
+	} else {
+		_, err = r.db.NamedExec(changedStatusHistorialPrice, historialToSave)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil

@@ -20,7 +20,10 @@ const (
 		) VALUES (
 		  	:idProveedor, :idInsumo, :precio, :fecha, :status
 		)
-		 ON DUPLICATE KEY UPDATE precio = VALUES(precio), fecha = VALUES(fecha)`
+		 ON DUPLICATE KEY UPDATE precio = VALUES(precio), fecha = VALUES(fecha), status = VALUES(status)`
+	changedStatusHistorialPrice = `
+		UPDATE Proveedores_Insumos
+		SET status = :status WHERE idProveedor = :idProveedor AND idInsumo = :idInsumo`
 )
 
 type proveedor struct {
@@ -57,17 +60,17 @@ func (dbItem proveedor) toEntity() *entities.Proveedor {
 type precioInsumoProveedor struct {
 	IdProveedor int64     `db:"idProveedor"`
 	IdInsumo    int64     `db:"idInsumo"`
-	Precio      float64   `db:"precio"`
+	Precio      *float64  `db:"precio"`
 	Fecha       time.Time `db:"fecha"`
 	Status      string    `db:"status"`
 }
 
-func newHistorialPrecioInsumo(idProveedor *int64, idInsumo *int64, precioUnitario *float64, fecha time.Time) precioInsumoProveedor {
+func newHistorialPrecioInsumo(idProveedor *int64, idInsumo *int64, precioUnitario *float64, fecha time.Time, status string) precioInsumoProveedor {
 	return precioInsumoProveedor{
 		IdProveedor: *idProveedor,
 		IdInsumo:    *idInsumo,
-		Precio:      *precioUnitario,
+		Precio:      precioUnitario,
 		Fecha:       fecha,
-		Status:      "activo",
+		Status:      status,
 	}
 }
