@@ -12,16 +12,16 @@ import (
 	"strconv"
 )
 
-type GetStock struct {
+type GetStockInsumo struct {
 	GetStockUseCase get_stock.UseCase
 	SearchInsumo    search_insumo.UseCase
 }
 
-func (handler GetStock) Handle(ginContext *gin.Context) {
+func (handler GetStockInsumo) Handle(ginContext *gin.Context) {
 	handler.handle(ginContext)
 }
 
-func (handler GetStock) handle(ctx *gin.Context) {
+func (handler GetStockInsumo) handle(ctx *gin.Context) {
 	var request contracts.Request
 
 	// lectura de parametros y verificación
