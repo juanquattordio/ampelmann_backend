@@ -1,4 +1,4 @@
-package documento
+package documento_producto
 
 import (
 	"database/sql"
@@ -13,31 +13,32 @@ type Repository struct {
 	db *sqlx.DB
 }
 
-func NewRepository(db *sqlx.DB) providers.Documento {
+func NewRepository(db *sqlx.DB) providers.DocumentoProducto {
 	repo := Repository{
 		db: db,
 	}
 	return &repo
 }
 
-func (r *Repository) CreateHeaderMovimientoDepositos(tx *sqlx.Tx, movimiento *entities.MovimientoHeader) (int64, error) {
-	var idHeader int64
-	if tx == nil {
-		stmt, err := r.db.Prepare(insertMovInsumoHeader)
-		result, err := stmt.Exec(&movimiento.IdDepositoOrigen, &movimiento.IdDepositoDestino, &movimiento.Fecha, movimiento.CausaMovimiento)
-		if err != nil {
-			return 0, errors.NewInternalServer("Fallo al crear documento")
-		}
-		idHeader, err = result.LastInsertId()
-	} else {
-		stmt, err := tx.Prepare(insertMovInsumoHeader)
-		result, err := stmt.Exec(&movimiento.IdDepositoOrigen, &movimiento.IdDepositoDestino, &movimiento.Fecha, movimiento.CausaMovimiento)
-		if err != nil {
-			return 0, errors.NewInternalServer("Fallo al crear documento")
-		}
-		idHeader, err = result.LastInsertId()
-	}
-	return idHeader, nil
+func (r *Repository) CreateHeaderMovimientoDepositos(tx *sqlx.Tx, movimiento *entities.MovimientoProductoHeader) (int64, error) {
+	//var idHeader int64
+	//if tx == nil {
+	//	stmt, err := r.db.Prepare(insertMovInsumoHeader)
+	//	result, err := stmt.Exec(&movimiento.IdDepositoOrigen, &movimiento.IdDepositoDestino, &movimiento.Fecha, movimiento.CausaMovimiento)
+	//	if err != nil {
+	//		return 0, errors.NewInternalServer("Fallo al crear documento")
+	//	}
+	//	idHeader, err = result.LastInsertId()
+	//} else {
+	//	stmt, err := tx.Prepare(insertMovInsumoHeader)
+	//	result, err := stmt.Exec(&movimiento.IdDepositoOrigen, &movimiento.IdDepositoDestino, &movimiento.Fecha, movimiento.CausaMovimiento)
+	//	if err != nil {
+	//		return 0, errors.NewInternalServer("Fallo al crear documento")
+	//	}
+	//	idHeader, err = result.LastInsertId()
+	//}
+	//return idHeader, nil
+	return 0, nil
 }
 
 func (r *Repository) CreateLineMovimientoDepositos(tx *sqlx.Tx, idHeader int64, idLinea int, idInsumo *int64, cantidad *float64,
@@ -59,7 +60,7 @@ func (r *Repository) CreateLineMovimientoDepositos(tx *sqlx.Tx, idHeader int64, 
 	return nil
 }
 
-func (r *Repository) CreateFacturaCompra(factura *entities.FacturaCompraHeader) error {
+func (r *Repository) CreateFacturaVenta(factura *entities.FacturaVentaHeader) error {
 	tx := r.db.MustBegin()
 	var err error
 	var idHeader int64
@@ -94,28 +95,29 @@ func (r *Repository) CreateFacturaCompra(factura *entities.FacturaCompraHeader) 
 	return nil
 }
 
-func (r *Repository) CreateHeaderFacturaCompra(tx *sqlx.Tx, factura *entities.FacturaCompraHeader) (int64, error) {
-	var (
-		idHeader int64
-		stmt     *sql.Stmt
-		result   sql.Result
-		err      error
-	)
-	if tx == nil {
-		stmt, err = r.db.Prepare(insertFacturaCompraHeader)
-	} else {
-		stmt, err = tx.Prepare(insertFacturaCompraHeader)
-	}
-	if factura.FechaOrigen.IsZero() {
-		result, err = stmt.Exec(&factura.IdProveedor, &factura.IdFacturaProveedor, nil, &factura.Fecha, &factura.ImporteTotal)
-	} else {
-		result, err = stmt.Exec(&factura.IdProveedor, &factura.IdFacturaProveedor, &factura.FechaOrigen, &factura.Fecha, &factura.ImporteTotal)
-	}
-	if err != nil {
-		return 0, errors.NewInternalServer("Fallo al crear documento")
-	}
-	idHeader, err = result.LastInsertId()
-	return idHeader, nil
+func (r *Repository) CreateHeaderFacturaCompra(tx *sqlx.Tx, factura *entities.FacturaVentaHeader) (int64, error) {
+	//var (
+	//	idHeader int64
+	//	stmt     *sql.Stmt
+	//	result   sql.Result
+	//	err      error
+	//)
+	//if tx == nil {
+	//	stmt, err = r.db.Prepare(insertFacturaCompraHeader)
+	//} else {
+	//	stmt, err = tx.Prepare(insertFacturaCompraHeader)
+	//}
+	//if factura.FechaOrigen.IsZero() {
+	//	result, err = stmt.Exec(&factura.IdProveedor, &factura.IdFacturaProveedor, nil, &factura.Fecha, &factura.ImporteTotal)
+	//} else {
+	//	result, err = stmt.Exec(&factura.IdProveedor, &factura.IdFacturaProveedor, &factura.FechaOrigen, &factura.Fecha, &factura.ImporteTotal)
+	//}
+	//if err != nil {
+	//	return 0, errors.NewInternalServer("Fallo al crear documento")
+	//}
+	//idHeader, err = result.LastInsertId()
+	//return idHeader, nil
+	return 0, nil
 }
 
 func (r *Repository) CreateLineFacturaCompra(tx *sqlx.Tx, idHeader int64, idLinea int, idInsumo *int64,

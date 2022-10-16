@@ -9,6 +9,7 @@ import (
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/create_producto_final"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/create_proveedor"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/get_stock"
+	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/get_stock_producto"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/movimiento_depositos"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/search_cliente"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/search_insumo"
@@ -29,6 +30,7 @@ import (
 	"github.com/juanquattordio/ampelmann_backend/src/api/repositories/producto_final"
 	"github.com/juanquattordio/ampelmann_backend/src/api/repositories/proveedor"
 	"github.com/juanquattordio/ampelmann_backend/src/api/repositories/stock"
+	"github.com/juanquattordio/ampelmann_backend/src/api/repositories/stock_producto"
 )
 
 type HandlerContainer struct {
@@ -65,7 +67,9 @@ func Start() *HandlerContainer {
 	proveedorRepository := proveedor.NewRepository(DB, insumoRepository)
 	depositoRepository := deposito.NewRepository(DB)
 	documentosRepository := documento.NewRepository(DB)
+	//documentosProductoRepository := documento.NewRepository(DB)
 	stockRepository := stock.NewRepository(DB, documentosRepository)
+	stockProductoRepository := stock_producto.NewRepository(DB)
 
 	// Use Cases
 	createClienteUseCase := &create_cliente.Implementation{
@@ -112,11 +116,11 @@ func Start() *HandlerContainer {
 	updateProductoFinalUseCase := &update_producto_final.Implementation{
 		ProductoFinalProvider: productoFinalRepository,
 	}
-	//getStockUseCase := &get_stock.Implementation{
-	//	InsumoProvider:   insumoRepository,
-	//	DepositoProvider: depositoRepository,
-	//	StockProvider:    stockRepository,
-	//}
+	getStockProductoUseCase := &get_stock_producto.Implementation{
+		ProductoProvider: productoFinalRepository,
+		DepositoProvider: depositoRepository,
+		StockProvider:    stockProductoRepository,
+	}
 	createDepositoUseCase := &create_deposito.Implementation{
 		DepositoProvider: depositoRepository,
 	}
@@ -179,9 +183,9 @@ func Start() *HandlerContainer {
 	handlers.UpdateProductoFinal = &api.UpdateProductoFinal{
 		UpdateProductoFinalUseCase: updateProductoFinalUseCase,
 	}
-	//handlers.GetStockProductoFinal = &api.GetStockProductoFinal{
-	//	GetStockProductoFinalUseCase: getStockProductoFinalUseCase,
-	//}
+	handlers.GetStockProductoFinal = &api.GetStockProducto{
+		GetStockProductoUseCase: getStockProductoUseCase,
+	}
 	handlers.CreateDeposito = &api.CreateDeposito{
 		CreateDepositoUseCase: createDepositoUseCase,
 	}

@@ -22,9 +22,9 @@ func (handler SearchProductoFinal) Handle(ginContext *gin.Context) {
 func (handler SearchProductoFinal) handle(ctx *gin.Context) {
 	var request contracts.Request
 
-	id := ctx.Query("id_producto_final")
+	id := ctx.Query("id_producto")
 	if id != "" {
-		productId, err := strconv.ParseInt(ctx.Query("id_producto_final"), 10, 64)
+		productId, err := strconv.ParseInt(ctx.Query("id_producto"), 10, 64)
 		if err != nil {
 			ctx.JSON(404, web.NewResponse(400, nil, err.Error()))
 			return

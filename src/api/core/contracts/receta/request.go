@@ -2,7 +2,7 @@ package receta
 
 type Request struct {
 	DetallePasoPaso *string  `form:"detalle_paso_paso" json:"detalle_paso_paso" binding:"required"`
-	IdProductoFinal *int64   `form:"id_producto_final" json:"id_producto_final"`
+	IdProductoFinal *int64   `form:"id_producto" json:"id_producto"`
 	Insumos         []Insumo `form:"insumos" json:"insumos" binding:"required"`
 	LitrosFinales   *float64 `form:"litros_finales" json:"litros_finales" binding:"required"`
 }

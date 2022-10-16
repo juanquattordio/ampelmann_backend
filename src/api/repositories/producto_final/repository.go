@@ -57,7 +57,7 @@ func (r *Repository) Update(productoFinal *entities.ProductoFinal) error {
 
 func buildSearchWhere(id *int64, nombre *string) (query string, args []interface{}) {
 	if id != nil {
-		query += " AND id_producto_final = ?"
+		query += " AND id_producto = ?"
 		args = append(args, id)
 	}
 	if nombre != nil && *nombre != "" {

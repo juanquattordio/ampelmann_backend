@@ -6,5 +6,5 @@ type RequestUpdate struct {
 }
 
 type RequestDelete struct {
-	Id *int `form:"insumo_id" json:"id_producto_final"`
+	Id *int `form:"insumo_id" json:"id_producto"`
 }

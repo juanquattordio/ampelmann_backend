@@ -63,7 +63,7 @@ func (r *Repository) GetStockDeposito(ctx context.Context, idDeposito *int64) ([
 	}
 	var insumos []entities.Insumo
 	for _, insumoDB := range dbStockDeposito {
-		//_ = rows.Scan(&insumoDB.IdDeposito, &insumoDB.IdInsumo, &insumoDB.NombreInsumo, &insumoDB.Stock)
+		//_ = rows.Scan(&insumoDB.IdDeposito, &insumoDB.IdArticulo, &insumoDB.NombreInsumo, &insumoDB.Stock)
 		insumo := insumoDB.toEntity()
 		insumos = append(insumos, insumo)
 	}

@@ -18,13 +18,6 @@ type Implementation struct {
 	StockProvider     providers.Stock
 }
 
-var (
-	ErrNotFoundProveedor = goErrors.New("proveedor not found")
-	ErrNotFoundInsumo    = goErrors.New("insumo not found")
-	ErrInternal          = goErrors.New("internal error")
-	ErrFieldsEmpty       = goErrors.New("some fields can not be empty. Operation cancelled.")
-)
-
 func (uc *Implementation) Execute(ctx context.Context, request create_factura_compra.Request) (*entities.FacturaCompraHeader, error) {
 	// valida que exista el proveedor
 	proveedorExists, err := uc.ProveedorProvider.Search(request.IdProveedor, nil)
@@ -62,11 +55,11 @@ func (uc *Implementation) Execute(ctx context.Context, request create_factura_co
 	return newFactura, nil
 }
 
-func toEntities(linesRequest []create_factura_compra.FacturaCompraLine) []entities.FacturaCompraLine {
-	var lineas []entities.FacturaCompraLine
+func toEntities(linesRequest []create_factura_compra.FacturaCompraLine) []entities.FacturaLine {
+	var lineas []entities.FacturaLine
 	for _, lineReq := range linesRequest {
-		line := new(entities.FacturaCompraLine)
-		line.IdInsumo = *lineReq.IdInsumo
+		line := new(entities.FacturaLine)
+		line.IdArticulo = *lineReq.IdInsumo
 		line.Cantidad = *lineReq.Cantidad
 		line.PrecioUnitario = *lineReq.PrecioUnitario
 		line.Obseraciones = lineReq.Obseraciones

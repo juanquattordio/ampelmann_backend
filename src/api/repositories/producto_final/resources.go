@@ -8,12 +8,12 @@ const (
 
 const (
 	saveScriptMySQL   = "INSERT INTO Producto_Final(descripcion, status) VALUES(:descripcion, :status)"
-	selectScriptMySQL = "SELECT id_producto_final, descripcion, status FROM Producto_Final"
-	updateScriptMySQL = "UPDATE Producto_Final SET descripcion = :descripcion, status = :status WHERE id_producto_final = :id_producto_final"
+	selectScriptMySQL = "SELECT id_producto, descripcion, status FROM Producto_Final"
+	updateScriptMySQL = "UPDATE Producto_Final SET descripcion = :descripcion, status = :status WHERE id_producto = :id_producto"
 )
 
 type productoFinal struct {
-	ID          int64  `db:"id_producto_final"`
+	ID          int64  `db:"id_producto"`
 	Descripcion string `db:"descripcion"`
 	Status      string `db:"status"`
 }

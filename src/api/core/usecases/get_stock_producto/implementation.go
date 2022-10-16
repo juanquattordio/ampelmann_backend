@@ -1,4 +1,4 @@
-package get_stock
+package get_stock_producto
 
 import (
 	"context"
@@ -9,23 +9,23 @@ import (
 )
 
 type Implementation struct {
-	InsumoProvider   providers.Insumo
+	ProductoProvider providers.ProductoFinal
 	DepositoProvider providers.Deposito
-	StockProvider    providers.Stock
+	StockProvider    providers.StockProducto
 }
 
 var (
-	ErrNotFoundInsumo   = goErrors.New("insumo not found")
+	ErrNotFoundProducto = goErrors.New("producto not found")
 	ErrNotFoundDeposito = goErrors.New("deposito not found")
 	ErrInternal         = goErrors.New("internal error")
 )
 
-func (uc *Implementation) GetStockByInsumo(ctx context.Context, idInsumo *int64, idDeposito *int64) (*entities.Insumo, *entities.Deposito, error) {
+func (uc *Implementation) GetStockByProducto(ctx context.Context, idProducto *int64, idDeposito *int64) (*entities.ProductoFinal, *entities.Deposito, error) {
 
 	// valida que exista la entidad a trabajar
-	insumoDB, err := uc.InsumoProvider.Search(idInsumo, nil)
-	if insumoDB == nil && goErrors.Is(err, sql.ErrNoRows) {
-		return nil, nil, ErrNotFoundInsumo
+	productoDB, err := uc.ProductoProvider.Search(idProducto, nil)
+	if productoDB == nil && goErrors.Is(err, sql.ErrNoRows) {
+		return nil, nil, ErrNotFoundProducto
 	}
 	depositoDB := new(entities.Deposito)
 	if idDeposito != nil {
@@ -35,22 +35,22 @@ func (uc *Implementation) GetStockByInsumo(ctx context.Context, idInsumo *int64,
 		}
 	}
 
-	stock, err := uc.StockProvider.GetStockInsumo(idInsumo, idDeposito)
-	insumoDB.Stock = stock
-	return insumoDB, depositoDB, err
+	stock, err := uc.StockProvider.GetStockProducto(idProducto, idDeposito)
+	productoDB.Stock = stock
+	return productoDB, depositoDB, err
 
 }
 
-func (uc *Implementation) GetStockByDeposito(ctx context.Context, idDeposito *int64) (*entities.Deposito, []entities.Insumo, error) {
+func (uc *Implementation) GetStockByDeposito(ctx context.Context, idDeposito *int64) (*entities.Deposito, []entities.ProductoFinal, error) {
 	//TODO Nunca va a llegar un idDeposito nil, se chequea con el validate en el handler.
 	depositoDB, err := uc.DepositoProvider.Search(idDeposito, nil)
 	if depositoDB == nil && goErrors.Is(err, sql.ErrNoRows) {
 		return nil, nil, ErrNotFoundDeposito
 	}
 
-	insumos, err := uc.StockProvider.GetStockDeposito(ctx, idDeposito)
+	productos, err := uc.StockProvider.GetStockDeposito(ctx, idDeposito)
 	if err != nil {
 		return nil, nil, err
 	}
-	return depositoDB, insumos, err
+	return depositoDB, productos, err
 }

@@ -71,7 +71,7 @@ func (handler GetStockInsumo) handle(ctx *gin.Context) {
 		if goErrors.Is(errors, sql.ErrNoRows) {
 			ctx.JSON(404, web.NewResponse(404, nil, errors.Error()))
 		} else {
-			ctx.JSON(404, web.NewResponse(404, nil, errors.Error()))
+			ctx.JSON(500, web.NewResponse(404, nil, errors.Error()))
 		}
 		return
 	}

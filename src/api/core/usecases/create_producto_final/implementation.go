@@ -25,7 +25,7 @@ func (uc *Implementation) Execute(ctx context.Context, request create_producto_f
 		return nil, ErrDuplicate
 	}
 
-	newProductoFinal := entities.NewProductoFinal(*request.Descripcion)
+	newProductoFinal := entities.NewProductoFinal(*request.Descripcion, 0)
 
 	lastId, err := uc.ProductoFinalProvider.Save(*newProductoFinal)
 	if err != nil {

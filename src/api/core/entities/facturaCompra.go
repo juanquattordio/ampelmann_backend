@@ -11,20 +11,20 @@ type FacturaCompraHeader struct {
 	IdProveedor        int64
 	IdFacturaProveedor string
 	FechaOrigen        time.Time
-	Lineas             []FacturaCompraLine
+	Lineas             []FacturaLine
 	ImporteTotal       float64
 	Status             string
 }
 
-type FacturaCompraLine struct {
+type FacturaLine struct {
 	IdLinea        int64
-	IdInsumo       int64
+	IdArticulo     int64
 	Cantidad       float64
 	PrecioUnitario float64
 	Obseraciones   string
 }
 
-func NewFacturaCompra(idProveedor int64, idFacturaProveedor string, fechaOrigen time.Time, lineas []FacturaCompraLine) *FacturaCompraHeader {
+func NewFacturaCompra(idProveedor int64, idFacturaProveedor string, fechaOrigen time.Time, lineas []FacturaLine) *FacturaCompraHeader {
 	facturaCompraHeader := &FacturaCompraHeader{
 		Fecha:              time.Now().UTC(),
 		IdProveedor:        idProveedor,
@@ -38,7 +38,7 @@ func NewFacturaCompra(idProveedor int64, idFacturaProveedor string, fechaOrigen 
 	return facturaCompraHeader
 }
 
-func calcularImporteTotal(lineas []FacturaCompraLine) float64 {
+func calcularImporteTotal(lineas []FacturaLine) float64 {
 	var total float64
 	for _, linea := range lineas {
 		total += linea.Cantidad * linea.PrecioUnitario

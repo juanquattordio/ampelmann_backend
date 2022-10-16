@@ -20,7 +20,7 @@ func NewResponse(factura *entities.FacturaCompraHeader) *Response {
 	lines := make([]FacturaCompraLine, len(factura.Lineas))
 	for i := range factura.Lineas {
 		lines[i].IdLinea = &factura.Lineas[i].IdLinea
-		lines[i].IdInsumo = &factura.Lineas[i].IdInsumo
+		lines[i].IdInsumo = &factura.Lineas[i].IdArticulo
 		lines[i].Cantidad = &factura.Lineas[i].Cantidad
 		lines[i].PrecioUnitario = &factura.Lineas[i].PrecioUnitario
 		lines[i].Obseraciones = factura.Lineas[i].Obseraciones

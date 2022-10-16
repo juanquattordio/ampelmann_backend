@@ -7,7 +7,7 @@ import (
 type Response struct {
 	IdHeader        *int64   `form:"id_header" json:"id_header"`
 	DetallePasoPaso *string  `form:"detalle_paso_paso" json:"detalle_paso_paso"`
-	IdProductoFinal *int64   `form:"id_producto_final" json:"id_producto_final"`
+	IdProductoFinal *int64   `form:"id_producto" json:"id_producto"`
 	LitrosFinales   *float64 `form:"litros_finales" json:"litros_finales"`
 	Insumos         []Insumo `form:"insumos" json:"insumos"`
 }

@@ -12,6 +12,7 @@ type ResponseByDeposito struct {
 }
 
 type Response struct {
+	IdDeposito int64   `json:"insumo_deposito,omitempty"`
 	Deposito   string  `json:"deposito,omitempty"`
 	ID         string  `json:"insumo_id"`
 	Nombre     string  `json:"insumo_nombre"`
@@ -25,6 +26,7 @@ type InsumoStock struct {
 
 func NewResponse(insumo *entities.Insumo, deposito *entities.Deposito) *Response {
 	return &Response{
+		IdDeposito: deposito.ID,
 		Deposito:   deposito.Descripcion,
 		ID:         fmt.Sprintf("%d", insumo.IdInsumo),
 		Nombre:     insumo.Nombre,

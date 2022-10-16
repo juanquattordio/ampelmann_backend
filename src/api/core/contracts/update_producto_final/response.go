@@ -6,7 +6,7 @@ import (
 )
 
 type Response struct {
-	ID          string `json:"id_producto_final"`
+	ID          string `json:"id_producto"`
 	Descripcion string `json:"descripcion"`
 	Status      string `json:"status"`
 }
