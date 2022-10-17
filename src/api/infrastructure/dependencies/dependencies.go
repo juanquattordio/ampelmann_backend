@@ -125,8 +125,9 @@ func Start() *HandlerContainer {
 		DepositoProvider: depositoRepository,
 	}
 	updateDepositoUseCase := &update_deposito.Implementation{
-		DepositoProvider: depositoRepository,
-		StockProvider:    stockRepository,
+		DepositoProvider:      depositoRepository,
+		StockProvider:         stockRepository,
+		StockProductoProvider: stockProductoRepository,
 	}
 	movimientoDepositoUseCase := &movimiento_depositos.Implementation{
 		DepositoProvider: depositoRepository,
