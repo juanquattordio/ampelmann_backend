@@ -8,6 +8,7 @@ import (
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/entities"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/entities/constants"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/providers"
+	"strings"
 )
 
 type Implementation struct {
@@ -18,6 +19,8 @@ var (
 	ErrNotFound          = goErrors.New("product not found")
 	ErrDuplicate         = goErrors.New("description already exists. Operation cancelled.")
 	ErrAllreadyCancelled = goErrors.New("product's status is already 'disabled'. Operation cancelled.")
+	ErrDisavailableUnit  = goErrors.New("unit of measurement disavailable. Operation cancelled.")
+	ErrStatusRequired    = goErrors.New("status required is not available. Operation cancelled.")
 )
 
 func (uc *Implementation) Execute(ctx context.Context, id int64, request update_producto_final.RequestUpdate) (*entities.ProductoFinal, error) {
@@ -26,6 +29,13 @@ func (uc *Implementation) Execute(ctx context.Context, id int64, request update_
 	productDB, err := uc.ProductoFinalProvider.Search(&id, nil)
 	if productDB == nil && goErrors.Is(err, sql.ErrNoRows) {
 		return nil, ErrNotFound
+	}
+
+	// si se quiere actualizar unidad de medida, valida su valor
+	if request.Unidad != nil {
+		if !isValidUnidad(*request.Unidad) {
+			return nil, ErrDisavailableUnit
+		}
 	}
 
 	if request.Descripcion == nil && request.Status == nil {
@@ -62,11 +72,25 @@ func prepareToUpdate(uc *Implementation, request update_producto_final.RequestUp
 			productDB.Descripcion = *request.Descripcion
 		}
 	}
-
+	if !isValidStatus(*request.Status) {
+		return nil, ErrStatusRequired
+	}
 	// asigna los valores a actualizar, si corresponde
-	if request.Status != nil && productDB.Status != *request.Status {
-		productDB.Status = *request.Status
+	if request.Status != nil && productDB.Status != strings.ToLower(*request.Status) {
+		productDB.Status = strings.ToLower(*request.Status)
 	}
 
 	return productDB, nil
+}
+
+func isValidUnidad(unidad string) bool {
+	unidad = strings.ToLower(unidad)
+	return unidad == constants.LTS ||
+		unidad == constants.UN
+}
+
+func isValidStatus(status string) bool {
+	status = strings.ToLower(status)
+	return status == constants.Activo ||
+		status == constants.Desactivo
 }

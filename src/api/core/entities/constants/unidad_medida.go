@@ -1,8 +1,8 @@
 package constants
 
 const (
-	Kg  string = "Kilogramos"
-	Grs string = "Gramos"
-	Lts string = "Litros"
-	Un  string = "Unidad"
+	KG  string = "kilogramos"
+	GRS string = "gramos"
+	LTS string = "litros"
+	UN  string = "unidad"
 )

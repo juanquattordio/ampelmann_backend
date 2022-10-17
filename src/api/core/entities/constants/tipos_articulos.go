@@ -1,6 +1,6 @@
 package constants
 
 const (
-	Insumos   string = "Insumos"
-	Productos string = "Productos"
+	Insumos   string = "insumos"
+	Productos string = "productos"
 )

@@ -1,6 +1,6 @@
 package constants
 
 const (
-	Desactivo string = "Desactivo"
-	Activo    string = "Activo"
+	Desactivo string = "desactivo"
+	Activo    string = "activo"
 )

@@ -31,7 +31,9 @@ func (uc *Implementation) Execute(ctx context.Context, req movimiento_depositos.
 	if err != nil || goErrors.Is(err, sql.ErrNoRows) {
 		return nil, err
 	}
-
+	if stockInsumos == nil {
+		return nil, ErrInsufficientStock
+	}
 	stockSuficiente, msgStockInsuficiente := validarStockOrigen(req.Insumos, stockInsumos)
 	if !stockSuficiente {
 		return nil, errors.NewInternalServer(msgStockInsuficiente)

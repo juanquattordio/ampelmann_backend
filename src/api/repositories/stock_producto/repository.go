@@ -59,8 +59,11 @@ func (r *Repository) GetStockProducto(idProducto *int64, idDeposito *int64) (flo
 func (r *Repository) GetStockDeposito(ctx context.Context, idDeposito *int64) ([]entities.ProductoFinal, error) {
 	var dbStockDeposito []stockDeposito
 	err := r.db.SelectContext(ctx, &dbStockDeposito, getStockByDeposito, idDeposito)
-	if err != nil && goErrors.Is(err, sql.ErrNoRows) || dbStockDeposito == nil {
-		return nil, errors.NewInternalServer("Deposito sin stock o inexistente")
+	if err != nil && !goErrors.Is(err, sql.ErrNoRows) {
+		return nil, errors.NewInternalServer("Deposito inexistente")
+	}
+	if dbStockDeposito == nil {
+		return nil, nil
 	}
 	var productos []entities.ProductoFinal
 	for _, productoDB := range dbStockDeposito {

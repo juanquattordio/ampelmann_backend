@@ -8,6 +8,7 @@ import (
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/entities"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/entities/constants"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/providers"
+	"strings"
 )
 
 type Implementation struct {
@@ -18,14 +19,22 @@ var (
 	ErrNotFound          = goErrors.New("insumo not found")
 	ErrDuplicate         = goErrors.New("name already exists. Operation cancelled.")
 	ErrAllreadyCancelled = goErrors.New("insumo's status is already 'desactivo'. Operation cancelled.")
+	ErrDisavailableUnit  = goErrors.New("unit of measurement disavailable. Operation cancelled.")
+	ErrStatusRequired    = goErrors.New("status required is not available. Operation cancelled.")
 )
 
 func (uc *Implementation) Execute(ctx context.Context, id int64, request update_insumo.RequestUpdate) (*entities.Insumo, error) {
-
 	// valida que exista la entidad a actualizar
 	insumoDB, err := uc.InsumoProvider.Search(&id, nil)
 	if insumoDB == nil && goErrors.Is(err, sql.ErrNoRows) {
 		return nil, ErrNotFound
+	}
+
+	// si se quiere actualizar unidad de medida, valida su valor
+	if request.Unidad != nil {
+		if !isValidUnidad(*request.Unidad) {
+			return nil, ErrDisavailableUnit
+		}
 	}
 
 	if request.Nombre == nil && request.Status == nil && request.Stock == nil {
@@ -63,12 +72,29 @@ func prepareToUpdate(uc *Implementation, request update_insumo.RequestUpdate, in
 		}
 	}
 
+	if !isValidStatus(*request.Status) {
+		return nil, ErrStatusRequired
+	}
 	// asigna los valores a actualizar, si corresponde
-	if request.Status != nil && insumoDB.Status != *request.Status {
-		insumoDB.Status = *request.Status
+	if request.Status != nil && insumoDB.Status != strings.ToLower(*request.Status) {
+		insumoDB.Status = strings.ToLower(*request.Status)
 	}
 	if request.Stock != nil && insumoDB.Stock != *request.Stock {
 		insumoDB.Stock = *request.Stock
 	}
 	return insumoDB, nil
+}
+
+func isValidUnidad(unidad string) bool {
+	unidad = strings.ToLower(unidad)
+	return unidad == constants.KG ||
+		unidad == constants.GRS ||
+		unidad == constants.LTS ||
+		unidad == constants.UN
+}
+
+func isValidStatus(status string) bool {
+	status = strings.ToLower(status)
+	return status == constants.Activo ||
+		status == constants.Desactivo
 }

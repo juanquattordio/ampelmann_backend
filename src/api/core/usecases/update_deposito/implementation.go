@@ -8,6 +8,7 @@ import (
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/entities"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/entities/constants"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/providers"
+	"strings"
 )
 
 type Implementation struct {
@@ -19,6 +20,7 @@ var (
 	ErrNotFound          = goErrors.New("deposito not found")
 	ErrDuplicate         = goErrors.New("deposito already exists. Operation cancelled")
 	ErrAllreadyCancelled = goErrors.New("deposito's status is already 'desactivo'. Operation cancelled")
+	ErrStatusRequired    = goErrors.New("status required is not available. Operation cancelled.")
 )
 
 func (uc *Implementation) Execute(ctx context.Context, id int64, request update_deposito.Request) (*entities.Deposito, error) {
@@ -72,11 +74,19 @@ func prepareToUpdate(uc *Implementation, request update_deposito.Request, deposi
 			depositoDB.Descripcion = *request.Descripcion
 		}
 	}
-
+	if !isValidStatus(*request.Status) {
+		return nil, ErrStatusRequired
+	}
 	// asigna los valores a actualizar, si corresponde
-	if request.Status != nil && depositoDB.Status != *request.Status {
-		depositoDB.Status = *request.Status
+	if request.Status != nil && depositoDB.Status != strings.ToLower(*request.Status) {
+		depositoDB.Status = strings.ToLower(*request.Status)
 	}
 
 	return depositoDB, nil
+}
+
+func isValidStatus(status string) bool {
+	status = strings.ToLower(status)
+	return status == constants.Activo ||
+		status == constants.Desactivo
 }

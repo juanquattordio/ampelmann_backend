@@ -26,7 +26,7 @@ func (r *Repository) Save(insumo entities.Insumo) error {
 	if err != nil {
 		return err
 	}
-	result, err := stmt.Exec(insumo.Nombre, insumo.Stock, insumo.Status)
+	result, err := stmt.Exec(insumo.Nombre, insumo.Unidad, insumo.Status)
 	if err != nil {
 		return err
 	}
@@ -57,7 +57,7 @@ func (r *Repository) Update(insumo *entities.Insumo) error {
 	if err != nil {
 		return err
 	}
-	_, err = stmt.Exec(insumo.Nombre, insumo.Stock, insumo.Status, insumo.IdInsumo)
+	_, err = stmt.Exec(insumo.Nombre, insumo.Unidad, insumo.Status, insumo.IdInsumo)
 	if err != nil {
 		return err
 	}

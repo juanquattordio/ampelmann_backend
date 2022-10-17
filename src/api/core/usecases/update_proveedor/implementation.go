@@ -8,6 +8,7 @@ import (
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/entities"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/entities/constants"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/providers"
+	"strings"
 )
 
 type Implementation struct {
@@ -18,6 +19,7 @@ var (
 	ErrNotFound          = goErrors.New("proveedor not found")
 	ErrDuplicate         = goErrors.New("CUIT already exists. Operation cancelled")
 	ErrAllreadyCancelled = goErrors.New("proveedor's status is already 'desactivo'. Operation cancelled")
+	ErrStatusRequired    = goErrors.New("status required is not available. Operation cancelled.")
 )
 
 func (uc *Implementation) Execute(ctx context.Context, id int64, request update_proveedor.Request) (*entities.Proveedor, error) {
@@ -62,7 +64,9 @@ func prepareToUpdate(uc *Implementation, request update_proveedor.Request, prove
 			proveedorDB.Cuit = *request.Cuit
 		}
 	}
-
+	if !isValidStatus(*request.Status) {
+		return nil, ErrStatusRequired
+	}
 	// asigna los valores a actualizar, si corresponde
 	if request.Nombre != nil && proveedorDB.Nombre != *request.Nombre {
 		proveedorDB.Nombre = *request.Nombre
@@ -73,9 +77,15 @@ func prepareToUpdate(uc *Implementation, request update_proveedor.Request, prove
 	if request.PaginaWeb != nil && proveedorDB.PaginaWeb != *request.PaginaWeb {
 		proveedorDB.PaginaWeb = *request.PaginaWeb
 	}
-	if request.Status != nil && proveedorDB.Status != *request.Status {
-		proveedorDB.Status = *request.Status
+	if request.Status != nil && proveedorDB.Status != strings.ToLower(*request.Status) {
+		proveedorDB.Status = strings.ToLower(*request.Status)
 	}
 
 	return proveedorDB, nil
+}
+
+func isValidStatus(status string) bool {
+	status = strings.ToLower(status)
+	return status == constants.Activo ||
+		status == constants.Desactivo
 }

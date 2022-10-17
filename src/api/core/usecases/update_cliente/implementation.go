@@ -8,6 +8,7 @@ import (
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/entities"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/entities/constants"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/providers"
+	"strings"
 )
 
 type Implementation struct {
@@ -18,6 +19,7 @@ var (
 	ErrNotFound          = goErrors.New("cliente not found")
 	ErrDuplicate         = goErrors.New("CUIT already exists. Operation cancelled")
 	ErrAllreadyCancelled = goErrors.New("cliente's status is already 'desactivo'. Operation cancelled")
+	ErrStatusRequired    = goErrors.New("status required is not available. Operation cancelled.")
 )
 
 func (uc *Implementation) Execute(ctx context.Context, id int64, request update_cliente.Request) (*entities.Cliente, error) {
@@ -62,7 +64,9 @@ func prepareToUpdate(uc *Implementation, request update_cliente.Request, cliente
 			clienteDB.Cuit = *request.Cuit
 		}
 	}
-
+	if !isValidStatus(*request.Status) {
+		return nil, ErrStatusRequired
+	}
 	// asigna los valores a actualizar, si corresponde
 	if request.Nombre != nil && clienteDB.Nombre != *request.Nombre {
 		clienteDB.Nombre = *request.Nombre
@@ -73,9 +77,15 @@ func prepareToUpdate(uc *Implementation, request update_cliente.Request, cliente
 	if request.Email != nil && clienteDB.Email != *request.Email {
 		clienteDB.Email = *request.Email
 	}
-	if request.Status != nil && clienteDB.Status != *request.Status {
-		clienteDB.Status = *request.Status
+	if request.Status != nil && clienteDB.Status != strings.ToLower(*request.Status) {
+		clienteDB.Status = strings.ToLower(*request.Status)
 	}
 
 	return clienteDB, nil
+}
+
+func isValidStatus(status string) bool {
+	status = strings.ToLower(status)
+	return status == constants.Activo ||
+		status == constants.Desactivo
 }

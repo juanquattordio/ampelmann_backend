@@ -21,7 +21,6 @@ func NewRepository(db *sqlx.DB) providers.ProductoFinal {
 var LastIdProductoFinal int64
 
 func (r *Repository) Save(productoFinal entities.ProductoFinal) (int64, error) {
-	//newEntity(productoFinal)
 	result, err := r.db.NamedExec(saveScriptMySQL, newEntity(productoFinal))
 	if err != nil {
 		return 0, err
