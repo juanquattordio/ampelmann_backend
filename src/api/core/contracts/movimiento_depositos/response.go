@@ -21,7 +21,7 @@ func NewResponse(movimiento *entities.MovimientoHeader) *Response {
 		insumos[i].IdLinea = &movimiento.Lineas[i].IdLinea
 		insumos[i].IdInsumo = &movimiento.Lineas[i].IdInsumo
 		insumos[i].Cantidad = &movimiento.Lineas[i].Cantidad
-		insumos[i].Obseraciones = movimiento.Lineas[i].Obseraciones
+		insumos[i].Observaciones = movimiento.Lineas[i].Observaciones
 	}
 	return &Response{
 		IdHeader:          &movimiento.IdHeader,

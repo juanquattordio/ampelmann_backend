@@ -62,7 +62,7 @@ func toEntities(linesRequest []create_factura_compra.FacturaCompraLine) []entiti
 		line.IdArticulo = *lineReq.IdInsumo
 		line.Cantidad = *lineReq.Cantidad
 		line.PrecioUnitario = *lineReq.PrecioUnitario
-		line.Obseraciones = lineReq.Obseraciones
+		line.Observaciones = lineReq.Observaciones
 		lineas = append(lineas, *line)
 	}
 	return lineas
@@ -74,7 +74,7 @@ func parseToMovLines(linesRequest []create_factura_compra.FacturaCompraLine) []e
 		line := new(entities.MovimientoLine)
 		line.IdInsumo = *lineReq.IdInsumo
 		line.Cantidad = *lineReq.Cantidad
-		line.Obseraciones = lineReq.Obseraciones
+		line.Observaciones = lineReq.Observaciones
 		lineas = append(lineas, *line)
 	}
 	return lineas

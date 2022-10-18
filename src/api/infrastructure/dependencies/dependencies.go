@@ -8,6 +8,7 @@ import (
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/create_insumo"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/create_producto_final"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/create_proveedor"
+	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/create_receta"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/get_stock"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/get_stock_producto"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/movimiento_depositos"
@@ -29,6 +30,7 @@ import (
 	"github.com/juanquattordio/ampelmann_backend/src/api/repositories/insumo"
 	"github.com/juanquattordio/ampelmann_backend/src/api/repositories/producto_final"
 	"github.com/juanquattordio/ampelmann_backend/src/api/repositories/proveedor"
+	"github.com/juanquattordio/ampelmann_backend/src/api/repositories/receta"
 	"github.com/juanquattordio/ampelmann_backend/src/api/repositories/stock"
 	"github.com/juanquattordio/ampelmann_backend/src/api/repositories/stock_producto"
 )
@@ -53,6 +55,7 @@ type HandlerContainer struct {
 	UpdateDeposito           entrypoints.Handler
 	CreateMovimientoDeposito entrypoints.Handler
 	CreateFacturaCompra      entrypoints.Handler
+	CreateReceta             entrypoints.Handler
 }
 
 func Start() *HandlerContainer {
@@ -68,6 +71,7 @@ func Start() *HandlerContainer {
 	depositoRepository := deposito.NewRepository(DB)
 	documentosRepository := documento.NewRepository(DB)
 	//documentosProductoRepository := documento.NewRepository(DB)
+	recetaRepository := receta.NewRepository(DB)
 	stockRepository := stock.NewRepository(DB, documentosRepository)
 	stockProductoRepository := stock_producto.NewRepository(DB)
 
@@ -139,6 +143,11 @@ func Start() *HandlerContainer {
 		InsumoProvider:    insumoRepository,
 		StockProvider:     stockRepository,
 	}
+	createRecetaUseCase := &create_receta.Implementation{
+		ProductoProvider: productoFinalRepository,
+		InsumoProvider:   insumoRepository,
+		RecetaProvider:   recetaRepository,
+	}
 
 	// API handlers
 	handlers := HandlerContainer{}
@@ -198,6 +207,9 @@ func Start() *HandlerContainer {
 	}
 	handlers.CreateFacturaCompra = &api.CreateFacturaCompra{
 		CreateFacturaCompraUseCase: createFacturaCompraUseCase,
+	}
+	handlers.CreateReceta = &api.CreateReceta{
+		CreateRecetaUseCase: createRecetaUseCase,
 	}
 
 	return &handlers

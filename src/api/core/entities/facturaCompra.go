@@ -21,7 +21,7 @@ type FacturaLine struct {
 	IdArticulo     int64
 	Cantidad       float64
 	PrecioUnitario float64
-	Obseraciones   string
+	Observaciones  string
 }
 
 func NewFacturaCompra(idProveedor int64, idFacturaProveedor string, fechaOrigen time.Time, lineas []FacturaLine) *FacturaCompraHeader {

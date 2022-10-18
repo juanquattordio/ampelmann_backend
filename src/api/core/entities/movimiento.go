@@ -16,10 +16,10 @@ type MovimientoHeader struct {
 }
 
 type MovimientoLine struct {
-	IdLinea      int64
-	IdInsumo     int64
-	Cantidad     float64
-	Obseraciones string
+	IdLinea       int64
+	IdInsumo      int64
+	Cantidad      float64
+	Observaciones string
 }
 
 func NewMovimientoDeposito(origen int64, destino int64, lineas []MovimientoLine, causaMovimiento string) *MovimientoHeader {

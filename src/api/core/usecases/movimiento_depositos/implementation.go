@@ -94,7 +94,7 @@ func toEntities(insumosRequest []movimiento_depositos.Insumo) []entities.Movimie
 		line := new(entities.MovimientoLine)
 		line.IdInsumo = *insumo.IdInsumo
 		line.Cantidad = *insumo.Cantidad
-		line.Obseraciones = insumo.Obseraciones
+		line.Observaciones = insumo.Observaciones
 		lineas = append(lineas, *line)
 	}
 	return lineas

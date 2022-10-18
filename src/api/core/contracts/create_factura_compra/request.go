@@ -21,7 +21,7 @@ type FacturaCompraLine struct {
 	IdInsumo       *int64   `form:"id_insumo" json:"id_insumo" binding:"required"`
 	Cantidad       *float64 `form:"cantidad" json:"cantidad" binding:"required"`
 	PrecioUnitario *float64 `form:"precio_unitario" json:"precio_unitario" binding:"required"`
-	Obseraciones   string   `form:"observaciones" json:"observaciones"`
+	Observaciones  string   `form:"observaciones" json:"observaciones"`
 }
 
 // Implement Marshaler and Unmarshaler interface

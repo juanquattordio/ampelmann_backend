@@ -9,8 +9,8 @@ type Request struct {
 }
 
 type Insumo struct {
-	IdLinea      *int64   `form:"id_linea" json:"id_linea"`
-	IdInsumo     *int64   `form:"id_insumo" json:"id_insumo" binding:"required"`
-	Cantidad     *float64 `form:"cantidad" json:"cantidad" binding:"required"`
-	Obseraciones string   `form:"observaciones" json:"observaciones"`
+	IdLinea       *int64   `form:"id_linea" json:"id_linea"`
+	IdInsumo      *int64   `form:"id_insumo" json:"id_insumo" binding:"required"`
+	Cantidad      *float64 `form:"cantidad" json:"cantidad" binding:"required"`
+	Observaciones string   `form:"observaciones" json:"observaciones"`
 }

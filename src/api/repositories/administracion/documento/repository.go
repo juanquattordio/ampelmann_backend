@@ -76,7 +76,7 @@ func (r *Repository) CreateFacturaCompra(factura *entities.FacturaCompraHeader) 
 	// inserta las líneas en la tabla
 	for i, linea := range factura.Lineas {
 		if err = r.CreateLineFacturaCompra(tx, idHeader, i, &linea.IdArticulo, &linea.Cantidad, &linea.PrecioUnitario,
-			&linea.Obseraciones); err != nil {
+			&linea.Observaciones); err != nil {
 			break
 		}
 		factura.Lineas[i].IdLinea = int64(i + 1)

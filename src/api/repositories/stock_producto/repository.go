@@ -97,7 +97,7 @@ func (r *Repository) GetStockDeposito(ctx context.Context, idDeposito *int64) ([
 //			break
 //		}
 //		if err = r.documentoProvider.CreateLineMovimientoDepositos(tx, idHeader, i, nil, &linea.IdProducto, &linea.Cantidad,
-//			&linea.Obseraciones); err != nil {
+//			&linea.Observaciones); err != nil {
 //			break
 //		}
 //		header.Lineas[i].IdLinea = int64(i + 1)

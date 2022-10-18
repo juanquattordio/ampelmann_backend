@@ -97,7 +97,7 @@ func (r *Repository) MovimientoDepositos(ctx context.Context, header *entities.M
 			break
 		}
 		if err = r.documentoProvider.CreateLineMovimientoDepositos(tx, idHeader, i, &linea.IdInsumo, &linea.Cantidad,
-			&linea.Obseraciones); err != nil {
+			&linea.Observaciones); err != nil {
 			break
 		}
 		header.Lineas[i].IdLinea = int64(i + 1)

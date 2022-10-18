@@ -23,7 +23,7 @@ func NewResponse(factura *entities.FacturaCompraHeader) *Response {
 		lines[i].IdInsumo = &factura.Lineas[i].IdArticulo
 		lines[i].Cantidad = &factura.Lineas[i].Cantidad
 		lines[i].PrecioUnitario = &factura.Lineas[i].PrecioUnitario
-		lines[i].Obseraciones = factura.Lineas[i].Obseraciones
+		lines[i].Observaciones = factura.Lineas[i].Observaciones
 	}
 	return &Response{
 		IdFactura:          &factura.IdFactura,
