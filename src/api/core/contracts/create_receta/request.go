@@ -8,7 +8,6 @@ type Request struct {
 }
 
 type Ingredientes struct {
-	//IdLinea  *int64   `form:"id_linea" json:"id_linea"`
 	IdInsumo      *int64   `form:"id_insumo" json:"id_insumo" binding:"required"`
 	Cantidad      *float64 `form:"cantidad" json:"cantidad" binding:"required"`
 	UnidadMedida  string   `form:"unidad_medida" json:"unidad_medida"`

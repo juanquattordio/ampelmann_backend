@@ -15,8 +15,9 @@ type Ingredientes struct {
 	Observaciones string
 }
 
-func NewReceta(pasoPaso string, idProductoFinal *int64, lineas []Ingredientes, litrosFinales float64) *RecetaHeader {
+func NewReceta(idHeader int64, pasoPaso string, idProductoFinal *int64, lineas []Ingredientes, litrosFinales float64) *RecetaHeader {
 	recetaHeader := &RecetaHeader{
+		IdHeader:        idHeader,
 		PasoPaso:        pasoPaso,
 		IdProductoFinal: idProductoFinal,
 		Ingredientes:    lineas,

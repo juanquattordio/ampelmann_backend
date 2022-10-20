@@ -8,7 +8,6 @@ import (
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/entities"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/errors"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/providers"
-	"strings"
 )
 
 type Repository struct {
@@ -35,7 +34,7 @@ func (r *Repository) CreateHeaderReceta(tx *sqlx.Tx, receta *entities.RecetaHead
 	}
 	result, err := stmt.Exec(&receta.PasoPaso, &receta.IdProductoFinal, &receta.LitrosFinales)
 	if err != nil {
-		return 0, errors.NewInternalServer(fmt.Sprintf("Fallo al crear receta de producto final id %d", *receta.IdProductoFinal))
+		return 0, errors.NewInternalServer(fmt.Sprintf("Fallo al crear recetaHeader de producto final id %d", *receta.IdProductoFinal))
 	}
 	idHeader, _ = result.LastInsertId()
 	return idHeader, nil
@@ -53,7 +52,7 @@ func (r *Repository) CreateLineReceta(tx *sqlx.Tx, idHeader int64, idInsumo *int
 	}
 	_, err = stmt.Exec(idHeader, &idInsumo, &cantidad, &observaciones)
 	if err != nil {
-		return errors.NewInternalServer(fmt.Sprintf("Fallo al asociar insumo id %d con receta header id %d", *idInsumo, idHeader))
+		return errors.NewInternalServer(fmt.Sprintf("Fallo al asociar insumo id %d con recetaHeader header id %d", *idInsumo, idHeader))
 	}
 	return nil
 }
@@ -68,7 +67,7 @@ func (r *Repository) CreateReceta(ctx context.Context, header *entities.RecetaHe
 		if errRollBack := tx.Rollback(); errRollBack != nil {
 			return errors.NewInternalServer("Fallo en el rollback de la transacción")
 		}
-		return errors.NewInternalServer("Fallo en crear header receta. Se hace rollback")
+		return errors.NewInternalServer("Fallo en crear header recetaHeader. Se hace rollback")
 	}
 	header.IdHeader = idHeader
 
@@ -91,30 +90,64 @@ func (r *Repository) CreateReceta(ctx context.Context, header *entities.RecetaHe
 	return nil
 }
 
-//func (r *Repository) UpdateReceta(tx *sqlx.Tx, idInsumo *int64, idDeposito *int64, cantidad float64) error {
-//	var err error
-//	if tx == nil {
-//		_, err = r.db.Query(updateReceta, &idDeposito, &idInsumo, &cantidad)
-//	} else {
-//		_, err = tx.Query(updateReceta, &idDeposito, &idInsumo, &cantidad)
-//		if err != nil {
-//			tx.Rollback()
-//			return errors.NewInternalServer("Fallo al actualizar stock")
-//		}
-//	}
-//
-//	return err
-//}
-
-func buildSearchWhere(idInsumo *int64, idDeposito *int64) (query string, args []interface{}) {
-	if idInsumo != nil {
-		query += " AND id_insumo = ?"
-		args = append(args, idInsumo)
+func (r *Repository) DeleteReceta(tx *sqlx.Tx, idReceta int64) error {
+	//stmt, err := r.db.Prepare(deleteRecetaHeader)
+	_, err := tx.Query(deleteRecetaHeader, idReceta)
+	if err != nil {
+		tx.Rollback()
+		return errors.NewInternalServer("Fallo al eliminar receta header")
 	}
-	if idDeposito != nil {
-		query += " AND id_deposito = ?"
-		args = append(args, idDeposito)
+	//fmt.Sprintf("%v", rows.r)
+	if _, err = tx.Query(deleteRecetaIngredientes, idReceta); err != nil {
+		tx.Rollback()
+		return errors.NewInternalServer("Fallo al eliminar ingredientes de receta receta header")
+	}
+	return nil
+}
+
+func (r *Repository) UpdateReceta(idReceta int64, receta *entities.RecetaHeader) error {
+	tx := r.db.MustBegin()
+
+	if err := r.DeleteReceta(tx, idReceta); err != nil {
+		return errors.NewInternalServer("Fallo al actualizar receta header")
 	}
 
-	return strings.Replace(query, " AND ", " WHERE ", 1), args
+	if _, err := tx.Query(reinsertRecetaHeader, receta.IdHeader, receta.PasoPaso, receta.IdProductoFinal, receta.LitrosFinales); err != nil {
+		tx.Rollback()
+		return errors.NewInternalServer("Fallo al actualizar receta header")
+	}
+	for _, ingrediente := range receta.Ingredientes {
+		if _, err := tx.Query(insertRecetaLine, receta.IdHeader, ingrediente.IdInsumo, ingrediente.Cantidad, ingrediente.Observaciones); err != nil {
+			tx.Rollback()
+			return errors.NewInternalServer(fmt.Sprintf("Fallo al actualizar ingrediente insumo %d de receta %d", ingrediente.IdInsumo, receta.IdHeader))
+		}
+	}
+
+	if err := tx.Commit(); err != nil {
+		return errors.NewInternalServer("Fallo en el commit de la transacción")
+	}
+
+	return nil
+}
+
+func (r *Repository) Search(idReceta *int64) (*entities.RecetaHeader, error) {
+	rows, err := r.db.Queryx(getRecetaDetails, idReceta)
+	if err != nil {
+		return nil, err
+	}
+
+	var ingredientes []entities.Ingredientes
+
+	for rows.Next() {
+		i := entities.Ingredientes{}
+		_ = rows.Scan(&i.IdInsumo, &i.UnidadMedida, &i.Cantidad, &i.Observaciones)
+		ingredientes = append(ingredientes, i)
+	}
+	rh := recetaHeader{}
+	rows.StructScan(&rh)
+
+	recetaResult := rh.toEntity()
+	recetaResult.Ingredientes = ingredientes
+
+	return recetaResult, nil
 }

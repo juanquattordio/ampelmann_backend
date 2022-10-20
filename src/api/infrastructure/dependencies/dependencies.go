@@ -22,6 +22,7 @@ import (
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/update_insumo"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/update_producto_final"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/update_proveedor"
+	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/update_receta"
 	"github.com/juanquattordio/ampelmann_backend/src/api/entrypoints"
 	"github.com/juanquattordio/ampelmann_backend/src/api/entrypoints/handlers/api"
 	"github.com/juanquattordio/ampelmann_backend/src/api/repositories/administracion/documento"
@@ -56,6 +57,7 @@ type HandlerContainer struct {
 	CreateMovimientoDeposito entrypoints.Handler
 	CreateFacturaCompra      entrypoints.Handler
 	CreateReceta             entrypoints.Handler
+	UpdateReceta             entrypoints.Handler
 }
 
 func Start() *HandlerContainer {
@@ -148,6 +150,11 @@ func Start() *HandlerContainer {
 		InsumoProvider:   insumoRepository,
 		RecetaProvider:   recetaRepository,
 	}
+	updateRecetaUseCase := &update_receta.Implementation{
+		RecetaProvider:   recetaRepository,
+		ProductoProvider: productoFinalRepository,
+		InsumoProvider:   insumoRepository,
+	}
 
 	// API handlers
 	handlers := HandlerContainer{}
@@ -210,6 +217,9 @@ func Start() *HandlerContainer {
 	}
 	handlers.CreateReceta = &api.CreateReceta{
 		CreateRecetaUseCase: createRecetaUseCase,
+	}
+	handlers.UpdateReceta = &api.UpdateReceta{
+		UpdateRecetaUseCase: updateRecetaUseCase,
 	}
 
 	return &handlers

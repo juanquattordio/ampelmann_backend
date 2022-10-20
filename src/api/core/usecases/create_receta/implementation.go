@@ -38,7 +38,7 @@ func (uc *Implementation) Execute(ctx context.Context, req create_receta.Request
 		req.Ingredientes[i].UnidadMedida = insumo.Unidad
 	}
 
-	receta := entities.NewReceta(*req.DetallePasoPaso, req.IdProductoFinal, toEntities(req.Ingredientes), *req.LitrosFinales)
+	receta := entities.NewReceta(0, *req.DetallePasoPaso, req.IdProductoFinal, toEntities(req.Ingredientes), *req.LitrosFinales)
 	err = uc.RecetaProvider.CreateReceta(ctx, receta)
 
 	if err != nil {
