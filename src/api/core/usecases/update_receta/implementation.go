@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/contracts/update_receta"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/entities"
-	"github.com/juanquattordio/ampelmann_backend/src/api/core/errors"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/providers"
 )
 
@@ -52,8 +51,8 @@ func validateRequestUpdate(uc *Implementation, idReceta int64, request *update_r
 	}
 	// verifico la receta a actualizar
 	_, err = uc.RecetaProvider.Search(&idReceta)
-	if err != nil || goErrors.Is(err, sql.ErrNoRows) {
-		return fmt.Errorf("receta id %d not found", idReceta)
+	if err != nil {
+		return err
 	}
 	return nil
 }
@@ -62,7 +61,7 @@ func prepareToUpdate(uc *Implementation, recetaToUpdate *entities.RecetaHeader) 
 	// compara contra los valores de la receta de la BD y actualiza según necesita.
 	recetaBD, err := uc.RecetaProvider.Search(&recetaToUpdate.IdHeader)
 	if err != nil {
-		return errors.NewNotFoundError("Header receta not found")
+		return err
 	}
 
 	if recetaToUpdate.PasoPaso == "" {

@@ -59,4 +59,5 @@ func configureAPIMappings(router *gin.Engine, handlers *dependencies.HandlerCont
 	recetas := ampelmannGroup.Group("/recetas")
 	recetas.POST("", handlers.CreateReceta.Handle)
 	recetas.PATCH("/:id", handlers.UpdateReceta.Handle)
+	recetas.DELETE("/:id", handlers.DeleteReceta.Handle)
 }

@@ -8,6 +8,7 @@ import (
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/entities"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/errors"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/providers"
+	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/delete_receta"
 )
 
 type Repository struct {
@@ -91,17 +92,30 @@ func (r *Repository) CreateReceta(ctx context.Context, header *entities.RecetaHe
 }
 
 func (r *Repository) DeleteReceta(tx *sqlx.Tx, idReceta int64) error {
-	//stmt, err := r.db.Prepare(deleteRecetaHeader)
-	_, err := tx.Query(deleteRecetaHeader, idReceta)
-	if err != nil {
-		tx.Rollback()
-		return errors.NewInternalServer("Fallo al eliminar receta header")
+	if tx == nil {
+		_, err := r.db.Query(deleteRecetaHeader, idReceta)
+		if err != nil {
+			return errors.NewInternalServer("Fallo al eliminar receta header")
+		}
+		if _, err = r.db.Query(deleteRecetaIngredientes, idReceta); err != nil {
+			return errors.NewInternalServer("Fallo al eliminar ingredientes de receta receta header")
+		}
+	} else {
+		_, err := tx.Query(deleteRecetaHeader, idReceta)
+		if err != nil {
+			if errRollBack := tx.Rollback(); errRollBack != nil {
+				return errors.NewInternalServer("Fallo en el rollback de la transacción")
+			}
+			return errors.NewInternalServer("Fallo al eliminar receta header")
+		}
+		if _, err = tx.Query(deleteRecetaIngredientes, idReceta); err != nil {
+			if errRollBack := tx.Rollback(); errRollBack != nil {
+				return errors.NewInternalServer("Fallo en el rollback de la transacción")
+			}
+			return errors.NewInternalServer("Fallo al eliminar ingredientes de receta receta header")
+		}
 	}
-	//fmt.Sprintf("%v", rows.r)
-	if _, err = tx.Query(deleteRecetaIngredientes, idReceta); err != nil {
-		tx.Rollback()
-		return errors.NewInternalServer("Fallo al eliminar ingredientes de receta receta header")
-	}
+
 	return nil
 }
 
@@ -113,12 +127,16 @@ func (r *Repository) UpdateReceta(idReceta int64, receta *entities.RecetaHeader)
 	}
 
 	if _, err := tx.Query(reinsertRecetaHeader, receta.IdHeader, receta.PasoPaso, receta.IdProductoFinal, receta.LitrosFinales); err != nil {
-		tx.Rollback()
+		if errRollBack := tx.Rollback(); errRollBack != nil {
+			return errors.NewInternalServer("Fallo en el rollback de la transacción")
+		}
 		return errors.NewInternalServer("Fallo al actualizar receta header")
 	}
 	for _, ingrediente := range receta.Ingredientes {
 		if _, err := tx.Query(insertRecetaLine, receta.IdHeader, ingrediente.IdInsumo, ingrediente.Cantidad, ingrediente.Observaciones); err != nil {
-			tx.Rollback()
+			if errRollBack := tx.Rollback(); errRollBack != nil {
+				return errors.NewInternalServer("Fallo en el rollback de la transacción")
+			}
 			return errors.NewInternalServer(fmt.Sprintf("Fallo al actualizar ingrediente insumo %d de receta %d", ingrediente.IdInsumo, receta.IdHeader))
 		}
 	}
@@ -134,6 +152,9 @@ func (r *Repository) Search(idReceta *int64) (*entities.RecetaHeader, error) {
 	rows, err := r.db.Queryx(getRecetaDetails, idReceta)
 	if err != nil {
 		return nil, err
+	}
+	if !rows.Next() {
+		return nil, delete_receta.ErrNotFound
 	}
 
 	var ingredientes []entities.Ingredientes
