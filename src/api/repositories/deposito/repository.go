@@ -21,7 +21,6 @@ func NewRepository(db *sqlx.DB) providers.Deposito {
 var LastIdDeposito int64
 
 func (r *Repository) Save(deposito entities.Deposito) error {
-
 	stmt, err := r.db.Prepare(saveScriptMySQL)
 	if err != nil {
 		return err

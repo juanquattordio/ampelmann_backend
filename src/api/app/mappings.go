@@ -60,4 +60,8 @@ func configureAPIMappings(router *gin.Engine, handlers *dependencies.HandlerCont
 	recetas.POST("", handlers.CreateReceta.Handle)
 	recetas.PATCH("/:id", handlers.UpdateReceta.Handle)
 	recetas.DELETE("/:id", handlers.DeleteReceta.Handle)
+
+	// Batchs Produccion
+	batchs := ampelmannGroup.Group("/batch")
+	batchs.POST("", handlers.CreateBatch.Handle)
 }

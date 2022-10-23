@@ -2,6 +2,7 @@ package dependencies
 
 import (
 	"github.com/juanquattordio/ampelmann_backend/src/api/config/db"
+	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/create_batch"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/create_cliente"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/create_deposito"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/create_factura_compra"
@@ -27,6 +28,7 @@ import (
 	"github.com/juanquattordio/ampelmann_backend/src/api/entrypoints"
 	"github.com/juanquattordio/ampelmann_backend/src/api/entrypoints/handlers/api"
 	"github.com/juanquattordio/ampelmann_backend/src/api/repositories/administracion/documento"
+	"github.com/juanquattordio/ampelmann_backend/src/api/repositories/batch"
 	"github.com/juanquattordio/ampelmann_backend/src/api/repositories/cliente"
 	"github.com/juanquattordio/ampelmann_backend/src/api/repositories/deposito"
 	"github.com/juanquattordio/ampelmann_backend/src/api/repositories/insumo"
@@ -60,6 +62,7 @@ type HandlerContainer struct {
 	CreateReceta             entrypoints.Handler
 	UpdateReceta             entrypoints.Handler
 	DeleteReceta             entrypoints.Handler
+	CreateBatch              entrypoints.Handler
 }
 
 func Start() *HandlerContainer {
@@ -78,6 +81,7 @@ func Start() *HandlerContainer {
 	recetaRepository := receta.NewRepository(DB)
 	stockRepository := stock.NewRepository(DB, documentosRepository)
 	stockProductoRepository := stock_producto.NewRepository(DB)
+	batchRepository := batch.NewRepository(DB)
 
 	// Use Cases
 	createClienteUseCase := &create_cliente.Implementation{
@@ -160,6 +164,10 @@ func Start() *HandlerContainer {
 	deleteRecetaUseCase := &delete_receta.Implementation{
 		RecetaProvider: recetaRepository,
 	}
+	createBatchUseCase := &create_batch.Implementation{
+		BatchProvider:  batchRepository,
+		RecetaProvider: recetaRepository,
+	}
 
 	// API handlers
 	handlers := HandlerContainer{}
@@ -229,6 +237,12 @@ func Start() *HandlerContainer {
 	handlers.DeleteReceta = &api.DeleteReceta{
 		DeleteRecetaUseCase: deleteRecetaUseCase,
 	}
+	handlers.CreateBatch = &api.CreateBatch{
+		CreateBatchUseCase: createBatchUseCase,
+	}
+	//handlers.DeleteBatch = &api.DeleteBatch{
+	//	DeleteBatchUseCase: deleteBatchUseCase,
+	//}
 
 	return &handlers
 }

@@ -19,9 +19,6 @@ func (uc *Implementation) Execute(ctx context.Context, id int64) error {
 	if err != nil {
 		return err
 	}
-	//if err == nil && receta == nil {
-	//	return errors.NewNotFoundError(fmt.Sprintf("receta id %d not found", id))
-	//}
 
 	if err = uc.RecetaProvider.DeleteReceta(nil, id); err != nil {
 		return err

@@ -153,22 +153,20 @@ func (r *Repository) Search(idReceta *int64) (*entities.RecetaHeader, error) {
 	if err != nil {
 		return nil, err
 	}
-	if !rows.Next() {
+
+	var ingredientes []recetaSearch
+
+	for rows.Next() {
+		i := recetaSearch{}
+		_ = rows.Scan(&i.IdReceta, &i.PasoPaso, &i.IdProducto, &i.Litros, &i.IdInsumo, &i.UnidadMedida, &i.Cantidad, &i.Observaciones)
+		ingredientes = append(ingredientes, i)
+	}
+
+	if len(ingredientes) == 0 {
 		return nil, delete_receta.ErrNotFound
 	}
 
-	var ingredientes []entities.Ingredientes
-
-	for rows.Next() {
-		i := entities.Ingredientes{}
-		_ = rows.Scan(&i.IdInsumo, &i.UnidadMedida, &i.Cantidad, &i.Observaciones)
-		ingredientes = append(ingredientes, i)
-	}
-	rh := recetaHeader{}
-	rows.StructScan(&rh)
-
-	recetaResult := rh.toEntity()
-	recetaResult.Ingredientes = ingredientes
+	recetaResult := toEntity(ingredientes)
 
 	return recetaResult, nil
 }
