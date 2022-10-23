@@ -36,13 +36,13 @@ func (r *Repository) CreateBatch(batch *entities.Batch) error {
 }
 func (r *Repository) GetLastBacth() (int64, error) {
 	row := r.db.QueryRow(lastBatchId)
-	lastIdBatch := new(int64)
+	lastIdBatch := int64(0)
 	err := row.Scan(&lastIdBatch)
-	if err != nil {
+	if err != nil && !strings.Contains(err.Error(), "sql: Scan error on column index 0, name") {
 		return 0, err
 	}
 
-	return *lastIdBatch, nil
+	return lastIdBatch, nil
 }
 
 func (r *Repository) DeleteBatch(tx *sqlx.Tx, idBatch int64) error {

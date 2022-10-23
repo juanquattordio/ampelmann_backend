@@ -29,7 +29,7 @@ func (handler CreateBatch) handle(ctx *gin.Context) {
 		switch err {
 		// todo mejorar estos errores
 		case delete_receta.ErrNotFound:
-			ctx.JSON(http.StatusInternalServerError, web.NewResponse(http.StatusInternalServerError, nil, err.Error()))
+			ctx.JSON(http.StatusNotFound, web.NewResponse(http.StatusNotFound, nil, err.Error()))
 		default:
 			ctx.JSON(http.StatusInternalServerError, web.NewResponse(http.StatusInternalServerError, nil, err.Error()))
 		}

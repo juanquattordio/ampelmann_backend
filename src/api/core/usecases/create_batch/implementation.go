@@ -7,6 +7,8 @@ import (
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/contracts/create_batch"
 	movimientoDeposito "github.com/juanquattordio/ampelmann_backend/src/api/core/contracts/movimiento_depositos"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/entities"
+	"github.com/juanquattordio/ampelmann_backend/src/api/core/errors"
+	"github.com/juanquattordio/ampelmann_backend/src/api/core/errors/apierrors"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/providers"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/movimiento_depositos"
 	"time"
@@ -19,12 +21,9 @@ type Implementation struct {
 }
 
 func (uc *Implementation) Execute(ctx context.Context, request create_batch.Request) (*entities.Batch, error) {
-	//// valida que exista la receta
-	//_, err := uc.RecetaProvider.Search(request.IdReceta)
-	//if err != nil {
-	//	return nil, err
-	//}
-
+	if *request.LitrosProducidos == 0 {
+		return nil, errors.NewBadRequest(apierrors.BadRequestMessage)
+	}
 	// verifica que exista la receta y calcula los insumos necesarios para los litros finales requeridos
 	ingredientes, err := uc.RecetaProvider.CalculateIngredientes(request.IdReceta, *request.LitrosProducidos)
 	if err != nil {
@@ -64,13 +63,14 @@ func (uc *Implementation) Execute(ctx context.Context, request create_batch.Requ
 }
 
 func reqConstructor(uc *Implementation, req *movimientoDeposito.Request, ingredientes []entities.Ingredientes) error {
-	*req.IdDepositoOrigen = int64(2)  // Insumos
-	*req.IdDepositoDestino = int64(1) // Produccion
+	req.IdDepositoOrigen = int64(2)  // Insumos
+	req.IdDepositoDestino = int64(0) // A descontar
 	insumos := make([]movimientoDeposito.Insumo, len(ingredientes))
-	for i, ingrediente := range ingredientes {
-		insumos[i].IdInsumo = &ingrediente.IdInsumo
-		insumos[i].Cantidad = &ingrediente.Cantidad
-		insumos[i].Observaciones = ingrediente.Observaciones
+	for i := range ingredientes {
+		insumos[i].IdLinea = int64(i + 1)
+		insumos[i].IdInsumo = &ingredientes[i].IdInsumo
+		insumos[i].Cantidad = &ingredientes[i].Cantidad
+		insumos[i].Observaciones = ingredientes[i].Observaciones
 	}
 	req.Insumos = insumos
 
@@ -79,6 +79,6 @@ func reqConstructor(uc *Implementation, req *movimientoDeposito.Request, ingredi
 		return err
 	}
 
-	*req.CausaMovimiento = fmt.Sprintf("OP-%d", lastBatch)
+	req.CausaMovimiento = fmt.Sprintf("OP-%d", lastBatch+1)
 	return nil
 }

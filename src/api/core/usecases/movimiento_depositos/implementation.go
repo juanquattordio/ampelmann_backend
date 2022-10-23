@@ -26,7 +26,7 @@ var (
 func (uc *Implementation) Execute(ctx context.Context, req movimiento_depositos.Request) (*entities.MovimientoHeader, error) {
 
 	// verifico stock disponible en origen
-	stockInsumos, err := uc.StockProvider.GetStockDeposito(ctx, req.IdDepositoOrigen)
+	stockInsumos, err := uc.StockProvider.GetStockDeposito(ctx, &req.IdDepositoOrigen)
 	// Si el deposito no está cargado, falla
 	if err != nil || goErrors.Is(err, sql.ErrNoRows) {
 		return nil, err
@@ -40,19 +40,19 @@ func (uc *Implementation) Execute(ctx context.Context, req movimiento_depositos.
 	}
 
 	// verifico deposito de destino
-	if deposito, err := uc.DepositoProvider.Search(req.IdDepositoDestino, nil); err != nil ||
+	if deposito, err := uc.DepositoProvider.Search(&req.IdDepositoDestino, nil); err != nil ||
 		deposito.Status == constants.Desactivo {
 		return nil, goErrors.New(fmt.Sprintf("Deposito destino no existe o está desactivado"))
 	}
 
 	// Crea un movimiento que ejecuta Updates de stocks en cada depósito
 	var causaMovimiento string
-	if req.CausaMovimiento == nil || *req.CausaMovimiento == "" {
+	if &req.CausaMovimiento == nil || req.CausaMovimiento == "" {
 		causaMovimiento = "Ajuste stock"
 	} else {
-		causaMovimiento = *req.CausaMovimiento
+		causaMovimiento = req.CausaMovimiento
 	}
-	movimiento := entities.NewMovimientoDeposito(*req.IdDepositoOrigen, *req.IdDepositoDestino, toEntities(req.Insumos), causaMovimiento)
+	movimiento := entities.NewMovimientoDeposito(req.IdDepositoOrigen, req.IdDepositoDestino, toEntities(req.Insumos), causaMovimiento)
 	err = uc.StockProvider.MovimientoDepositos(ctx, movimiento)
 
 	if err != nil {
@@ -67,12 +67,10 @@ func validarStockOrigen(movimientos []movimiento_depositos.Insumo, stockDeposito
 	// Todo Se podría hacer una búsqueda ordenada o algo más eficiente
 	for _, lineaMov := range movimientos {
 		stockSuficiente = false
-		msgStockInsuficiente += fmt.Sprintf("Stock insuficiente id_producto: %d en en deposito de origen de este movimiento.",
-			*lineaMov.IdInsumo)
 		for i := 0; i < len(stockDeposito); i++ {
 			if *lineaMov.IdInsumo == stockDeposito[i].IdInsumo {
-				msgStockInsuficiente += fmt.Sprintf("Stock insuficiente id_producto: %d con stock %.2f para este movimiento.",
-					stockDeposito[i].IdInsumo, stockDeposito[i].Stock)
+				msgStockInsuficiente = fmt.Sprintf("Stock insuficiente id_producto: %d con stock %.2f para este movimiento se necesitan %.2f.",
+					stockDeposito[i].IdInsumo, stockDeposito[i].Stock, *lineaMov.Cantidad)
 				if stockDeposito[i].Stock >= *lineaMov.Cantidad {
 					stockSuficiente = true
 					stockDeposito[i].Stock = stockDeposito[i].Stock - *lineaMov.Cantidad

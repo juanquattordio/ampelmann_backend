@@ -18,7 +18,7 @@ type Response struct {
 func NewResponse(movimiento *entities.MovimientoHeader) *Response {
 	insumos := make([]Insumo, len(movimiento.Lineas))
 	for i := range movimiento.Lineas {
-		insumos[i].IdLinea = &movimiento.Lineas[i].IdLinea
+		insumos[i].IdLinea = movimiento.Lineas[i].IdLinea
 		insumos[i].IdInsumo = &movimiento.Lineas[i].IdInsumo
 		insumos[i].Cantidad = &movimiento.Lineas[i].Cantidad
 		insumos[i].Observaciones = movimiento.Lineas[i].Observaciones

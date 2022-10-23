@@ -93,8 +93,10 @@ func (r *Repository) MovimientoDepositos(ctx context.Context, header *entities.M
 		if err = r.UpdateStock(tx, &linea.IdInsumo, &header.IdDepositoOrigen, -(linea.Cantidad)); err != nil {
 			break
 		}
-		if err = r.UpdateStock(tx, &linea.IdInsumo, &header.IdDepositoDestino, linea.Cantidad); err != nil {
-			break
+		if header.IdDepositoDestino != 0 {
+			if err = r.UpdateStock(tx, &linea.IdInsumo, &header.IdDepositoDestino, linea.Cantidad); err != nil {
+				break
+			}
 		}
 		if err = r.documentoProvider.CreateLineMovimientoDepositos(tx, idHeader, i, &linea.IdInsumo, &linea.Cantidad,
 			&linea.Observaciones); err != nil {

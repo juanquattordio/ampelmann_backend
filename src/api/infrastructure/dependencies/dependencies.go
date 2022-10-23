@@ -165,8 +165,9 @@ func Start() *HandlerContainer {
 		RecetaProvider: recetaRepository,
 	}
 	createBatchUseCase := &create_batch.Implementation{
-		BatchProvider:  batchRepository,
-		RecetaProvider: recetaRepository,
+		BatchProvider:            batchRepository,
+		RecetaProvider:           recetaRepository,
+		MovimientoInsumosUseCase: movimientoDepositoUseCase,
 	}
 
 	// API handlers
