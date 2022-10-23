@@ -7,5 +7,6 @@ import (
 
 type Batch interface {
 	CreateBatch(batch *entities.Batch) error
+	GetLastBacth() (int64, error)
 	DeleteBatch(tx *sqlx.Tx, idBatch int64) error
 }

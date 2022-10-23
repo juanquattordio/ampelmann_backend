@@ -170,3 +170,18 @@ func (r *Repository) Search(idReceta *int64) (*entities.RecetaHeader, error) {
 
 	return recetaResult, nil
 }
+
+func (r *Repository) CalculateIngredientes(idReceta *int64, litrosFinales float64) ([]entities.Ingredientes, error) {
+	receta, err := r.Search(idReceta)
+	if err != nil {
+		return nil, err
+	}
+
+	ingredientes := make([]entities.Ingredientes, len(receta.Ingredientes))
+	multiplo := litrosFinales / receta.LitrosFinales
+	copy(ingredientes, receta.Ingredientes)
+	for i, ingrediente := range receta.Ingredientes {
+		ingredientes[i].Cantidad = ingrediente.Cantidad * multiplo
+	}
+	return ingredientes, nil
+}

@@ -9,6 +9,7 @@ import (
 type Receta interface {
 	CreateReceta(ctx context.Context, movimiento *entities.RecetaHeader) error
 	Search(idReceta *int64) (*entities.RecetaHeader, error)
+	CalculateIngredientes(idReceta *int64, litrosFinales float64) ([]entities.Ingredientes, error)
 	UpdateReceta(idReceta int64, receta *entities.RecetaHeader) error
 	DeleteReceta(tx *sqlx.Tx, idReceta int64) error
 	CreateHeaderReceta(tx *sqlx.Tx, receta *entities.RecetaHeader) (int64, error)

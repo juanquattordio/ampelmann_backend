@@ -11,6 +11,7 @@ const (
 
 const (
 	saveScriptMySQL = "INSERT INTO Produccion_Batch(id_receta, fecha, litros_producidos) VALUES(?, ?, ?) "
+	lastBatchId     = "SELECT MAX(id_batch) FROM Produccion_Batch"
 	batchByBatch    = "SELECT id_batch, id_receta, fecha, multiplo_receta FROM Produccion_Batch"
 	batchByReceta   = "SELECT id_batch, id_receta, fecha, multiplo_receta FROM Produccion_Batch WHERE id_receta = ?"
 )

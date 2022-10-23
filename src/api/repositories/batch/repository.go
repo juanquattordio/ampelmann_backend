@@ -18,8 +18,6 @@ func NewRepository(db *sqlx.DB) providers.Batch {
 	return &repo
 }
 
-var LastIdBatch int64
-
 func (r *Repository) CreateBatch(batch *entities.Batch) error {
 	stmt, err := r.db.Prepare(saveScriptMySQL)
 	if err != nil {
@@ -36,8 +34,15 @@ func (r *Repository) CreateBatch(batch *entities.Batch) error {
 
 	return nil
 }
-func (r *Repository) GetLastID() (int64, error) {
-	return LastIdBatch, nil
+func (r *Repository) GetLastBacth() (int64, error) {
+	row := r.db.QueryRow(lastBatchId)
+	lastIdBatch := new(int64)
+	err := row.Scan(&lastIdBatch)
+	if err != nil {
+		return 0, err
+	}
+
+	return *lastIdBatch, nil
 }
 
 func (r *Repository) DeleteBatch(tx *sqlx.Tx, idBatch int64) error {
