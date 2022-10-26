@@ -13,8 +13,9 @@ import (
 )
 
 type Implementation struct {
-	StockProvider    providers.Stock
-	DepositoProvider providers.Deposito
+	StockProvider         providers.Stock
+	StockProductoProvider providers.StockProducto
+	DepositoProvider      providers.Deposito
 }
 
 var (
@@ -24,19 +25,43 @@ var (
 )
 
 func (uc *Implementation) Execute(ctx context.Context, req movimiento_depositos.Request) (*entities.MovimientoHeader, error) {
+	var (
+		movimientoLines []entities.MovimientoLine
+		tipoArticulo    string
+	)
+	if req.Productos == nil {
+		// verifico stock disponible en origen
+		stockInsumos, err := uc.StockProvider.GetStockDeposito(ctx, &req.IdDepositoOrigen)
+		// Si el deposito no está cargado, falla
+		if err != nil || goErrors.Is(err, sql.ErrNoRows) {
+			return nil, err
+		}
+		if stockInsumos == nil {
+			return nil, ErrInsufficientStock
+		}
+		stockSuficiente, msgStockInsuficiente := validarStockInsumosOrigen(req.Insumos, stockInsumos)
+		if !stockSuficiente {
+			return nil, errors.NewInternalServer(msgStockInsuficiente)
+		}
+		movimientoLines = toEntities(req.Insumos)
+		tipoArticulo = constants.Insumos
+	} else {
+		// verifico stock disponible en origen
+		stockProductos, err := uc.StockProductoProvider.GetStockDeposito(ctx, &req.IdDepositoOrigen)
+		// Si el deposito no está cargado, falla
+		if err != nil || goErrors.Is(err, sql.ErrNoRows) {
+			return nil, err
+		}
+		if stockProductos == nil {
+			return nil, ErrInsufficientStock
+		}
+		stockSuficiente, msgStockInsuficiente := validarStockProductosOrigen(req.Productos, stockProductos)
+		if !stockSuficiente {
+			return nil, errors.NewInternalServer(msgStockInsuficiente)
+		}
+		movimientoLines = toEntities(req.Productos)
+		tipoArticulo = constants.Productos
 
-	// verifico stock disponible en origen
-	stockInsumos, err := uc.StockProvider.GetStockDeposito(ctx, &req.IdDepositoOrigen)
-	// Si el deposito no está cargado, falla
-	if err != nil || goErrors.Is(err, sql.ErrNoRows) {
-		return nil, err
-	}
-	if stockInsumos == nil {
-		return nil, ErrInsufficientStock
-	}
-	stockSuficiente, msgStockInsuficiente := validarStockOrigen(req.Insumos, stockInsumos)
-	if !stockSuficiente {
-		return nil, errors.NewInternalServer(msgStockInsuficiente)
 	}
 
 	// verifico deposito de destino
@@ -52,8 +77,9 @@ func (uc *Implementation) Execute(ctx context.Context, req movimiento_depositos.
 	} else {
 		causaMovimiento = req.CausaMovimiento
 	}
-	movimiento := entities.NewMovimientoDeposito(req.IdDepositoOrigen, req.IdDepositoDestino, toEntities(req.Insumos), causaMovimiento)
-	err = uc.StockProvider.MovimientoDepositos(ctx, movimiento)
+
+	movimiento := entities.NewMovimientoDeposito(req.IdDepositoOrigen, req.IdDepositoDestino, movimientoLines, causaMovimiento)
+	err := uc.StockProvider.MovimientoDepositos(ctx, movimiento, tipoArticulo)
 
 	if err != nil {
 		return nil, err
@@ -61,14 +87,14 @@ func (uc *Implementation) Execute(ctx context.Context, req movimiento_depositos.
 
 	return movimiento, nil
 }
-func validarStockOrigen(movimientos []movimiento_depositos.Insumo, stockDeposito []entities.Insumo) (stockSuficiente bool, msg string) {
+func validarStockInsumosOrigen(movimientos []movimiento_depositos.Articulos, stockDeposito []entities.Insumo) (stockSuficiente bool, msg string) {
 	stockSuficiente = false
 	var msgStockInsuficiente string
 	// Todo Se podría hacer una búsqueda ordenada o algo más eficiente
 	for _, lineaMov := range movimientos {
 		stockSuficiente = false
 		for i := 0; i < len(stockDeposito); i++ {
-			if *lineaMov.IdInsumo == stockDeposito[i].IdInsumo {
+			if *lineaMov.IdArticulo == stockDeposito[i].IdInsumo {
 				msgStockInsuficiente = fmt.Sprintf("Stock insuficiente id_producto: %d con stock %.2f para este movimiento se necesitan %.2f.",
 					stockDeposito[i].IdInsumo, stockDeposito[i].Stock, *lineaMov.Cantidad)
 				if stockDeposito[i].Stock >= *lineaMov.Cantidad {
@@ -86,13 +112,38 @@ func validarStockOrigen(movimientos []movimiento_depositos.Insumo, stockDeposito
 	return stockSuficiente, msgStockInsuficiente
 }
 
-func toEntities(insumosRequest []movimiento_depositos.Insumo) []entities.MovimientoLine {
+func validarStockProductosOrigen(movimientos []movimiento_depositos.Articulos, stockDeposito []entities.ProductoFinal) (stockSuficiente bool, msg string) {
+	stockSuficiente = false
+	var msgStockInsuficiente string
+	// Todo Se podría hacer una búsqueda ordenada o algo más eficiente
+	for _, lineaMov := range movimientos {
+		stockSuficiente = false
+		for i := 0; i < len(stockDeposito); i++ {
+			if *lineaMov.IdArticulo == stockDeposito[i].Id {
+				msgStockInsuficiente = fmt.Sprintf("Stock insuficiente id_producto: %d con stock %.2f para este movimiento se necesitan %.2f.",
+					stockDeposito[i].Id, stockDeposito[i].Stock, *lineaMov.Cantidad)
+				if stockDeposito[i].Stock >= *lineaMov.Cantidad {
+					stockSuficiente = true
+					stockDeposito[i].Stock = stockDeposito[i].Stock - *lineaMov.Cantidad
+					msgStockInsuficiente = ""
+				}
+				break
+			}
+		}
+		if !stockSuficiente {
+			break
+		}
+	}
+	return stockSuficiente, msgStockInsuficiente
+}
+
+func toEntities(insumosRequest []movimiento_depositos.Articulos) []entities.MovimientoLine {
 	var lineas []entities.MovimientoLine
-	for _, insumo := range insumosRequest {
+	for _, ingrediente := range insumosRequest {
 		line := new(entities.MovimientoLine)
-		line.IdInsumo = *insumo.IdInsumo
-		line.Cantidad = *insumo.Cantidad
-		line.Observaciones = insumo.Observaciones
+		line.IdArticulo = *ingrediente.IdArticulo
+		line.Cantidad = *ingrediente.Cantidad
+		line.Observaciones = ingrediente.Observaciones
 		lineas = append(lineas, *line)
 	}
 	return lineas

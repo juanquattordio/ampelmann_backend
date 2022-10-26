@@ -6,6 +6,7 @@ import (
 	goErrors "errors"
 	"github.com/jmoiron/sqlx"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/entities"
+	"github.com/juanquattordio/ampelmann_backend/src/api/core/entities/constants"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/errors"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/providers"
 	"strings"
@@ -74,32 +75,32 @@ func (r *Repository) GetStockDeposito(ctx context.Context, idDeposito *int64) ([
 	return insumos, nil
 }
 
-func (r *Repository) MovimientoDepositos(ctx context.Context, header *entities.MovimientoHeader) error {
+func (r *Repository) MovimientoDepositos(ctx context.Context, header *entities.MovimientoHeader, tipoArticulo string) error {
 	tx := r.db.MustBegin()
 	var err error
 	var idHeader int64
 
 	// inserta header en tabla
-	if idHeader, err = r.documentoProvider.CreateHeaderMovimientoDepositos(tx, header); err != nil {
+	if idHeader, err = r.documentoProvider.CreateHeaderMovimientoDepositos(tx, header, tipoArticulo); err != nil {
 		if errRollBack := tx.Rollback(); errRollBack != nil {
 			return errors.NewInternalServer("Fallo en el rollback de la transacción")
 		}
-		return errors.NewInternalServer("Fallo en crear header movimiento insumos. Se hace rollback")
+		return errors.NewInternalServer("Fallo en crear header movimiento. Se hace rollback")
 	}
 	header.IdHeader = idHeader
 
 	// por cada linea del comprobante se actualiza stocks e inserta linea de comprobante en tabla
 	for i, linea := range header.Lineas {
-		if err = r.UpdateStock(tx, &linea.IdInsumo, &header.IdDepositoOrigen, -(linea.Cantidad)); err != nil {
+		if err = r.UpdateStock(tx, &linea.IdArticulo, &header.IdDepositoOrigen, -(linea.Cantidad), tipoArticulo); err != nil {
 			break
 		}
 		if header.IdDepositoDestino != 0 {
-			if err = r.UpdateStock(tx, &linea.IdInsumo, &header.IdDepositoDestino, linea.Cantidad); err != nil {
+			if err = r.UpdateStock(tx, &linea.IdArticulo, &header.IdDepositoDestino, linea.Cantidad, tipoArticulo); err != nil {
 				break
 			}
 		}
-		if err = r.documentoProvider.CreateLineMovimientoDepositos(tx, idHeader, i, &linea.IdInsumo, &linea.Cantidad,
-			&linea.Observaciones); err != nil {
+		if err = r.documentoProvider.CreateLineMovimientoDepositos(tx, idHeader, i, &linea.IdArticulo, &linea.Cantidad,
+			&linea.Observaciones, tipoArticulo); err != nil {
 			break
 		}
 		header.Lineas[i].IdLinea = int64(i + 1)
@@ -117,12 +118,22 @@ func (r *Repository) MovimientoDepositos(ctx context.Context, header *entities.M
 	return nil
 }
 
-func (r *Repository) UpdateStock(tx *sqlx.Tx, idInsumo *int64, idDeposito *int64, cantidad float64) error {
-	var err error
+func (r *Repository) UpdateStock(tx *sqlx.Tx, idArticulo *int64, idDeposito *int64, cantidad float64, tipoArticulo string) error {
+	var (
+		err   error
+		query string
+	)
+
+	if tipoArticulo == constants.Insumos {
+		query = updateStockInsumos
+	}
+	if tipoArticulo == constants.Productos {
+		query = updateStockProductos
+	}
 	if tx == nil {
-		_, err = r.db.Query(updateStock, &idDeposito, &idInsumo, &cantidad)
+		_, err = r.db.Query(query, &idDeposito, &idArticulo, &cantidad)
 	} else {
-		_, err = tx.Query(updateStock, &idDeposito, &idInsumo, &cantidad)
+		_, err = tx.Query(query, &idDeposito, &idArticulo, &cantidad)
 		if err != nil {
 			tx.Rollback()
 			return errors.NewInternalServer("Fallo al actualizar stock")

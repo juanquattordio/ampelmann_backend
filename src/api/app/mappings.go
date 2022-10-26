@@ -26,7 +26,6 @@ func configureAPIMappings(router *gin.Engine, handlers *dependencies.HandlerCont
 	insumos.PATCH("/:id", handlers.UpdateInsumo.Handle)
 	insumos.PATCH("/:id/cancel", handlers.UpdateInsumo.Handle)
 	insumos.GET("/stock", handlers.GetStockInsumo.Handle)
-	insumos.POST("movimiento/create", handlers.CreateMovimientoDeposito.Handle)
 
 	// Productos Finales endpoints
 	productosFinales := ampelmannGroup.Group("/productos")
@@ -35,7 +34,6 @@ func configureAPIMappings(router *gin.Engine, handlers *dependencies.HandlerCont
 	productosFinales.PATCH("/:id", handlers.UpdateProductoFinal.Handle)
 	productosFinales.PATCH("/:id/cancel", handlers.UpdateProductoFinal.Handle)
 	productosFinales.GET("/stock", handlers.GetStockProductoFinal.Handle)
-	//productosFinales.POST("movimiento/create", handlers.CreateMovimientoDeposito.Handle)
 
 	// Proveedores endpoints
 	proveedores := ampelmannGroup.Group("/proveedores")
@@ -50,6 +48,7 @@ func configureAPIMappings(router *gin.Engine, handlers *dependencies.HandlerCont
 	depositos.POST("", handlers.CreateDeposito.Handle)
 	depositos.PATCH("/:id", handlers.UpdateDeposito.Handle)
 	depositos.PATCH("/:id/cancel", handlers.UpdateDeposito.Handle)
+	depositos.POST("movimiento/create", handlers.CreateMovimientoDeposito.Handle)
 
 	// Facturas
 	facturasCompra := ampelmannGroup.Group("/facturas-compra")

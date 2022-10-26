@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/contracts/create_factura_compra"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/entities"
+	"github.com/juanquattordio/ampelmann_backend/src/api/core/entities/constants"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/providers"
 	"time"
 )
@@ -48,7 +49,7 @@ func (uc *Implementation) Execute(ctx context.Context, request create_factura_co
 	idDepositoInsumos := int64(2)
 	causaMovimiento := fmt.Sprintf("FCP-%d", newFactura.IdFactura)
 	movimiento := entities.NewMovimientoDeposito(0, idDepositoInsumos, parseToMovLines(request.Lineas), causaMovimiento)
-	if err = uc.StockProvider.MovimientoDepositos(ctx, movimiento); err != nil {
+	if err = uc.StockProvider.MovimientoDepositos(ctx, movimiento, constants.Insumos); err != nil {
 		return nil, goErrors.New(fmt.Sprintf("fallo en la creación del movimiento de insumos por compra"))
 	}
 
@@ -72,7 +73,7 @@ func parseToMovLines(linesRequest []create_factura_compra.FacturaCompraLine) []e
 	var lineas []entities.MovimientoLine
 	for _, lineReq := range linesRequest {
 		line := new(entities.MovimientoLine)
-		line.IdInsumo = *lineReq.IdInsumo
+		line.IdArticulo = *lineReq.IdInsumo
 		line.Cantidad = *lineReq.Cantidad
 		line.Observaciones = lineReq.Observaciones
 		lineas = append(lineas, *line)

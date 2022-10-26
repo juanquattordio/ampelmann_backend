@@ -65,10 +65,10 @@ func (uc *Implementation) Execute(ctx context.Context, request create_batch.Requ
 func reqConstructor(uc *Implementation, req *movimientoDeposito.Request, ingredientes []entities.Ingredientes) error {
 	req.IdDepositoOrigen = int64(2)  // Insumos
 	req.IdDepositoDestino = int64(0) // A descontar
-	insumos := make([]movimientoDeposito.Insumo, len(ingredientes))
+	insumos := make([]movimientoDeposito.Articulos, len(ingredientes))
 	for i := range ingredientes {
 		insumos[i].IdLinea = int64(i + 1)
-		insumos[i].IdInsumo = &ingredientes[i].IdInsumo
+		insumos[i].IdArticulo = &ingredientes[i].IdInsumo
 		insumos[i].Cantidad = &ingredientes[i].Cantidad
 		insumos[i].Observaciones = ingredientes[i].Observaciones
 	}

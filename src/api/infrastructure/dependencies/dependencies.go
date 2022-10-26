@@ -142,8 +142,9 @@ func Start() *HandlerContainer {
 		StockProductoProvider: stockProductoRepository,
 	}
 	movimientoDepositoUseCase := &movimiento_depositos.Implementation{
-		DepositoProvider: depositoRepository,
-		StockProvider:    stockRepository,
+		DepositoProvider:      depositoRepository,
+		StockProvider:         stockRepository,
+		StockProductoProvider: stockProductoRepository,
 	}
 	createFacturaCompraUseCase := &create_factura_compra.Implementation{
 		ProveedorProvider: proveedorRepository,

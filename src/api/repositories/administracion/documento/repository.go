@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/entities"
+	"github.com/juanquattordio/ampelmann_backend/src/api/core/entities/constants"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/errors"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/providers"
 )
@@ -20,18 +21,30 @@ func NewRepository(db *sqlx.DB) providers.Documento {
 	return &repo
 }
 
-func (r *Repository) CreateHeaderMovimientoDepositos(tx *sqlx.Tx, movimiento *entities.MovimientoHeader) (int64, error) {
-	var idHeader int64
+func (r *Repository) CreateHeaderMovimientoDepositos(tx *sqlx.Tx, movimiento *entities.MovimientoHeader, tipoArticulo string) (int64, error) {
+	var (
+		idHeader int64
+		stmt     *sql.Stmt
+		result   sql.Result
+		err      error
+		query    string
+	)
+	if tipoArticulo == constants.Insumos {
+		query = insertMovInsumoHeader
+	}
+	if tipoArticulo == constants.Productos {
+		query = insertMovProductoHeader
+	}
 	if tx == nil {
-		stmt, err := r.db.Prepare(insertMovInsumoHeader)
-		result, err := stmt.Exec(&movimiento.IdDepositoOrigen, &movimiento.IdDepositoDestino, &movimiento.Fecha, movimiento.CausaMovimiento)
+		stmt, err = r.db.Prepare(query)
+		result, err = stmt.Exec(&movimiento.IdDepositoOrigen, &movimiento.IdDepositoDestino, &movimiento.Fecha, movimiento.CausaMovimiento)
 		if err != nil {
 			return 0, errors.NewInternalServer("Fallo al crear documento")
 		}
 		idHeader, err = result.LastInsertId()
 	} else {
-		stmt, err := tx.Prepare(insertMovInsumoHeader)
-		result, err := stmt.Exec(&movimiento.IdDepositoOrigen, &movimiento.IdDepositoDestino, &movimiento.Fecha, movimiento.CausaMovimiento)
+		stmt, err = tx.Prepare(query)
+		result, err = stmt.Exec(&movimiento.IdDepositoOrigen, &movimiento.IdDepositoDestino, &movimiento.Fecha, movimiento.CausaMovimiento)
 		if err != nil {
 			return 0, errors.NewInternalServer("Fallo al crear documento")
 		}
@@ -41,16 +54,23 @@ func (r *Repository) CreateHeaderMovimientoDepositos(tx *sqlx.Tx, movimiento *en
 }
 
 func (r *Repository) CreateLineMovimientoDepositos(tx *sqlx.Tx, idHeader int64, idLinea int, idInsumo *int64, cantidad *float64,
-	observaciones *string) error {
+	observaciones *string, tipoArticulo string) error {
+	var query string
 	idLinea += 1
+	if tipoArticulo == constants.Insumos {
+		query = insertMovInsumoLine
+	}
+	if tipoArticulo == constants.Productos {
+		query = insertMovProductoLine
+	}
 	if tx == nil {
-		stmt, err := r.db.Prepare(insertMovInsumoLine)
+		stmt, err := r.db.Prepare(query)
 		_, err = stmt.Exec(idHeader, idLinea, &idInsumo, &cantidad, &observaciones)
 		if err != nil {
 			return errors.NewInternalServer(fmt.Sprintf("Fallo al crear linea %d de header id %d", idLinea, idHeader))
 		}
 	} else {
-		stmt, err := tx.Prepare(insertMovInsumoLine)
+		stmt, err := tx.Prepare(query)
 		_, err = stmt.Exec(idHeader, idLinea, &idInsumo, &cantidad, &observaciones)
 		if err != nil {
 			return errors.NewInternalServer(fmt.Sprintf("Fallo al crear documento %d de header id %d", idLinea, idHeader))

@@ -24,6 +24,11 @@ func (handler CreateMovimientoDeposito) handle(ctx *gin.Context) {
 		ctx.JSON(404, web.NewResponse(400, nil, err.Error()))
 		return
 	}
+	if request.Insumos != nil && request.Productos != nil {
+		ctx.JSON(http.StatusBadRequest, web.NewResponse(400, nil, "Only one type of articles: insumos or productos"))
+		return
+	}
+
 	movimiento, err := handler.CreateMovimientoDepositoUseCase.Execute(ctx, request)
 	if err != nil {
 		switch err {

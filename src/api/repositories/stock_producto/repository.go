@@ -13,10 +13,10 @@ import (
 
 type Repository struct {
 	db                *sqlx.DB
-	documentoProvider providers.DocumentoProducto
+	documentoProvider providers.Documento
 }
 
-//func NewRepository(db *sqlx.DB, documentoProvider providers.DocumentoProducto) providers.StockProducto {
+// func NewRepository(db *sqlx.DB, documentoProvider providers.DocumentoProducto) providers.StockProducto {
 func NewRepository(db *sqlx.DB) providers.StockProducto {
 	repo := Repository{
 		db: db,

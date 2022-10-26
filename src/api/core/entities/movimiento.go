@@ -17,7 +17,7 @@ type MovimientoHeader struct {
 
 type MovimientoLine struct {
 	IdLinea       int64
-	IdInsumo      int64
+	IdArticulo    int64
 	Cantidad      float64
 	Observaciones string
 }

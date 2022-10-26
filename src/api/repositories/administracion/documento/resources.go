@@ -8,7 +8,9 @@ const (
 
 const (
 	insertMovInsumoHeader     = "INSERT INTO Movimiento_Insumos_Header (idDeposito_Origen, idDeposito_Destino, fecha, causa_movimiento) VALUES(?,?,?,?)"
+	insertMovProductoHeader   = "INSERT INTO Movimiento_Productos_Header (id_deposito_origen, id_deposito_destino, fecha, causa_movimiento) VALUES(?,?,?,?)"
 	insertMovInsumoLine       = "INSERT INTO Movimiento_Insumos_Line (idMovimiento, idLinea, idInsumo, cantidad, observaciones) VALUES(?,?,?,?,?)"
+	insertMovProductoLine     = "INSERT INTO Movimiento_Productos_Line (id_movimiento, id_linea, id_producto, cantidad, observaciones) VALUES(?,?,?,?,?)"
 	insertFacturaCompraHeader = "INSERT INTO Compra_Factura_Header (id_proveedor, id_factura_proveedor, fecha_origen, fecha, importe_total) VALUES(?,?,?,?,?)"
 	insertFacturaCompraLine   = "INSERT INTO Compra_Factura_Line (id_factura, id_linea, id_insumo, cantidad, precio_unitario, observaciones) VALUES(?,?,?,?,?,?)"
 )
