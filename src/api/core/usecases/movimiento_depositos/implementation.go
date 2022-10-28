@@ -46,19 +46,22 @@ func (uc *Implementation) Execute(ctx context.Context, req movimiento_depositos.
 		movimientoLines = toEntities(req.Insumos)
 		tipoArticulo = constants.Insumos
 	} else {
-		// verifico stock disponible en origen
-		stockProductos, err := uc.StockProductoProvider.GetStockDeposito(ctx, &req.IdDepositoOrigen)
-		// Si el deposito no está cargado, falla
-		if err != nil || goErrors.Is(err, sql.ErrNoRows) {
-			return nil, err
+		if req.IdDepositoOrigen != 0 {
+			// verifico stock disponible en origen
+			stockProductos, err := uc.StockProductoProvider.GetStockDeposito(ctx, &req.IdDepositoOrigen)
+			// Si el deposito no está cargado, falla
+			if err != nil || goErrors.Is(err, sql.ErrNoRows) {
+				return nil, err
+			}
+			if stockProductos == nil {
+				return nil, ErrInsufficientStock
+			}
+			stockSuficiente, msgStockInsuficiente := validarStockProductosOrigen(req.Productos, stockProductos)
+			if !stockSuficiente {
+				return nil, errors.NewInternalServer(msgStockInsuficiente)
+			}
 		}
-		if stockProductos == nil {
-			return nil, ErrInsufficientStock
-		}
-		stockSuficiente, msgStockInsuficiente := validarStockProductosOrigen(req.Productos, stockProductos)
-		if !stockSuficiente {
-			return nil, errors.NewInternalServer(msgStockInsuficiente)
-		}
+
 		movimientoLines = toEntities(req.Productos)
 		tipoArticulo = constants.Productos
 
@@ -137,13 +140,13 @@ func validarStockProductosOrigen(movimientos []movimiento_depositos.Articulos, s
 	return stockSuficiente, msgStockInsuficiente
 }
 
-func toEntities(insumosRequest []movimiento_depositos.Articulos) []entities.MovimientoLine {
+func toEntities(articulosRequest []movimiento_depositos.Articulos) []entities.MovimientoLine {
 	var lineas []entities.MovimientoLine
-	for _, ingrediente := range insumosRequest {
+	for _, articulo := range articulosRequest {
 		line := new(entities.MovimientoLine)
-		line.IdArticulo = *ingrediente.IdArticulo
-		line.Cantidad = *ingrediente.Cantidad
-		line.Observaciones = ingrediente.Observaciones
+		line.IdArticulo = *articulo.IdArticulo
+		line.Cantidad = *articulo.Cantidad
+		line.Observaciones = articulo.Observaciones
 		lineas = append(lineas, *line)
 	}
 	return lineas

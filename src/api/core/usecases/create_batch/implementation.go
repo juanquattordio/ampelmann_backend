@@ -31,15 +31,16 @@ func (uc *Implementation) Execute(ctx context.Context, request create_batch.Requ
 	}
 
 	// verifica que haya stock suficiente para la producción y carga el movimiento de insumos
-	var reqMov movimientoDeposito.Request
-	if err = reqConstructor(uc, &reqMov, ingredientes); err != nil {
+	var reqInsumosMov movimientoDeposito.Request
+	if err = newReqMovimientoInsumos(uc, &reqInsumosMov, ingredientes); err != nil {
 		return nil, err
 	}
-	_, err = uc.MovimientoInsumosUseCase.Execute(ctx, reqMov)
+	_, err = uc.MovimientoInsumosUseCase.Execute(ctx, reqInsumosMov)
 	if err != nil {
 		return nil, err
 	}
 
+	// crea el batch de producción
 	fecha := time.Now()
 	if request.FechaOrigen != nil {
 		fecha = time.Time(*request.FechaOrigen)
@@ -51,18 +52,20 @@ func (uc *Implementation) Execute(ctx context.Context, request create_batch.Requ
 		return nil, goErrors.New(fmt.Sprintf("fallo en la creación del batch"))
 	}
 
-	//// Crea un movimiento que ejecuta Updates de stocks en cada depósito
-	//idDepositoInsumos := int64(2)
-	//causaMovimiento := fmt.Sprintf("FCP-%d", newBatch.IdBatch)
-	//movimiento := entities.NewMovimientoDeposito(0, idDepositoInsumos, parseToMovLines(request.Lineas), causaMovimiento)
-	//if err = uc.StockProvider.MovimientoDepositos(ctx, movimiento); err != nil {
-	//	return nil, goErrors.New(fmt.Sprintf("fallo en la creación del movimiento de insumos por compra"))
-	//}
+	// Crea un movimiento que ejecuta Updates de stocks del producto final elaborado.
+	var reqProductoMov movimientoDeposito.Request
+	if err = newReqMovimientoProductos(uc, &reqProductoMov, &newBatch); err != nil {
+		return nil, err
+	}
+	_, err = uc.MovimientoInsumosUseCase.Execute(ctx, reqProductoMov)
+	if err != nil {
+		return nil, err
+	}
 
 	return &newBatch, nil
 }
 
-func reqConstructor(uc *Implementation, req *movimientoDeposito.Request, ingredientes []entities.Ingredientes) error {
+func newReqMovimientoInsumos(uc *Implementation, req *movimientoDeposito.Request, ingredientes []entities.Ingredientes) error {
 	req.IdDepositoOrigen = int64(2)  // Insumos
 	req.IdDepositoDestino = int64(0) // A descontar
 	insumos := make([]movimientoDeposito.Articulos, len(ingredientes))
@@ -80,5 +83,23 @@ func reqConstructor(uc *Implementation, req *movimientoDeposito.Request, ingredi
 	}
 
 	req.CausaMovimiento = fmt.Sprintf("OP-%d", lastBatch+1)
+	return nil
+}
+
+func newReqMovimientoProductos(uc *Implementation, req *movimientoDeposito.Request, batch *entities.Batch) error {
+	req.IdDepositoOrigen = int64(0)  // Nulo
+	req.IdDepositoDestino = int64(3) // Producto final
+	producto := new(movimientoDeposito.Articulos)
+	producto.IdLinea = int64(1)
+	recetaHeader, err := uc.RecetaProvider.Search(&batch.IdReceta)
+	if err != nil {
+		return err
+	}
+	producto.IdArticulo = recetaHeader.IdProductoFinal
+	producto.Cantidad = &batch.LitrosProducidos
+
+	req.Productos = append(req.Productos, *producto)
+
+	req.CausaMovimiento = fmt.Sprintf("OP-%d", batch.IdBatch)
 	return nil
 }
