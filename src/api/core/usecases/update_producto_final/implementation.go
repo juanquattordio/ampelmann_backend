@@ -41,7 +41,7 @@ func (uc *Implementation) Execute(ctx context.Context, id int64, request update_
 	if request.Descripcion == nil && request.Status == nil {
 		productDB, err = changeStatusProductoFinal(productDB)
 	} else {
-		productDB, err = prepareToUpdate(uc, request, productDB)
+		productDB, err = uc.prepareToUpdate(request, productDB)
 	}
 	if err != nil {
 		return productDB, err
@@ -62,7 +62,7 @@ func changeStatusProductoFinal(productDB *entities.ProductoFinal) (*entities.Pro
 		return productDB, ErrAllreadyCancelled
 	}
 }
-func prepareToUpdate(uc *Implementation, request update_producto_final.RequestUpdate, productDB *entities.ProductoFinal) (*entities.ProductoFinal, error) {
+func (uc *Implementation) prepareToUpdate(request update_producto_final.RequestUpdate, productDB *entities.ProductoFinal) (*entities.ProductoFinal, error) {
 	// si se quiere actualizar este campo, valida que no existan duplicados.
 	if request.Descripcion != nil && productDB.Descripcion != *request.Descripcion {
 		productExists, err := uc.ProductoFinalProvider.Search(nil, request.Descripcion)

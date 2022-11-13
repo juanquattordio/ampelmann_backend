@@ -6,6 +6,7 @@ import (
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/create_cliente"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/create_deposito"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/create_factura_compra"
+	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/create_factura_venta"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/create_insumo"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/create_producto_final"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/create_proveedor"
@@ -59,6 +60,7 @@ type HandlerContainer struct {
 	UpdateDeposito           entrypoints.Handler
 	CreateMovimientoDeposito entrypoints.Handler
 	CreateFacturaCompra      entrypoints.Handler
+	CreateFacturaVenta       entrypoints.Handler
 	CreateReceta             entrypoints.Handler
 	UpdateReceta             entrypoints.Handler
 	DeleteReceta             entrypoints.Handler
@@ -152,6 +154,12 @@ func Start() *HandlerContainer {
 		InsumoProvider:    insumoRepository,
 		StockProvider:     stockRepository,
 	}
+	createFacturaVentaUseCase := &create_factura_venta.Implementation{
+		ClienteProvider:           clienteRepository,
+		DocumentoProvider:         documentosRepository,
+		ProductoProvider:          productoFinalRepository,
+		MovimientoDepositoUseCase: movimientoDepositoUseCase,
+	}
 	createRecetaUseCase := &create_receta.Implementation{
 		ProductoProvider: productoFinalRepository,
 		InsumoProvider:   insumoRepository,
@@ -229,6 +237,9 @@ func Start() *HandlerContainer {
 	}
 	handlers.CreateFacturaCompra = &api.CreateFacturaCompra{
 		CreateFacturaCompraUseCase: createFacturaCompraUseCase,
+	}
+	handlers.CreateFacturaVenta = &api.CreateFacturaVenta{
+		CreateFacturaVentaUseCase: createFacturaVentaUseCase,
 	}
 	handlers.CreateReceta = &api.CreateReceta{
 		CreateRecetaUseCase: createRecetaUseCase,

@@ -33,7 +33,7 @@ func (uc *Implementation) Execute(ctx context.Context, id int64, request update_
 	if request.Cuit == nil && request.Nombre == nil && request.Ubicacion == nil && request.Email == nil && request.Status == nil {
 		clienteDB, err = changeStatusCliente(clienteDB)
 	} else {
-		clienteDB, err = prepareToUpdate(uc, request, clienteDB)
+		clienteDB, err = uc.prepareToUpdate(request, clienteDB)
 	}
 	if err != nil {
 		return clienteDB, err
@@ -54,7 +54,7 @@ func changeStatusCliente(clienteDB *entities.Cliente) (*entities.Cliente, error)
 		return clienteDB, ErrAllreadyCancelled
 	}
 }
-func prepareToUpdate(uc *Implementation, request update_cliente.Request, clienteDB *entities.Cliente) (*entities.Cliente, error) {
+func (uc *Implementation) prepareToUpdate(request update_cliente.Request, clienteDB *entities.Cliente) (*entities.Cliente, error) {
 	// si se quiere actualizar este campo, valida que no existan duplicados.
 	if request.Cuit != nil && clienteDB.Cuit != *request.Cuit {
 		clienteExists, err := uc.ClienteProvider.Search(nil, request.Cuit)

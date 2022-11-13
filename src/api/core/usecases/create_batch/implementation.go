@@ -32,7 +32,7 @@ func (uc *Implementation) Execute(ctx context.Context, request create_batch.Requ
 
 	// verifica que haya stock suficiente para la producción y carga el movimiento de insumos
 	var reqInsumosMov movimientoDeposito.Request
-	if err = newReqMovimientoInsumos(uc, &reqInsumosMov, ingredientes); err != nil {
+	if err = uc.newReqMovimientoInsumos(&reqInsumosMov, ingredientes); err != nil {
 		return nil, err
 	}
 	_, err = uc.MovimientoInsumosUseCase.Execute(ctx, reqInsumosMov)
@@ -54,7 +54,7 @@ func (uc *Implementation) Execute(ctx context.Context, request create_batch.Requ
 
 	// Crea un movimiento que ejecuta Updates de stocks del producto final elaborado.
 	var reqProductoMov movimientoDeposito.Request
-	if err = newReqMovimientoProductos(uc, &reqProductoMov, &newBatch); err != nil {
+	if err = uc.newReqMovimientoProductos(&reqProductoMov, &newBatch); err != nil {
 		return nil, err
 	}
 	_, err = uc.MovimientoInsumosUseCase.Execute(ctx, reqProductoMov)
@@ -65,7 +65,7 @@ func (uc *Implementation) Execute(ctx context.Context, request create_batch.Requ
 	return &newBatch, nil
 }
 
-func newReqMovimientoInsumos(uc *Implementation, req *movimientoDeposito.Request, ingredientes []entities.Ingredientes) error {
+func (uc *Implementation) newReqMovimientoInsumos(req *movimientoDeposito.Request, ingredientes []entities.Ingredientes) error {
 	req.IdDepositoOrigen = int64(2)  // Insumos
 	req.IdDepositoDestino = int64(0) // A descontar
 	insumos := make([]movimientoDeposito.Articulos, len(ingredientes))
@@ -86,7 +86,7 @@ func newReqMovimientoInsumos(uc *Implementation, req *movimientoDeposito.Request
 	return nil
 }
 
-func newReqMovimientoProductos(uc *Implementation, req *movimientoDeposito.Request, batch *entities.Batch) error {
+func (uc *Implementation) newReqMovimientoProductos(req *movimientoDeposito.Request, batch *entities.Batch) error {
 	req.IdDepositoOrigen = int64(0)  // Nulo
 	req.IdDepositoDestino = int64(3) // Producto final
 	producto := new(movimientoDeposito.Articulos)

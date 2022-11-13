@@ -1,8 +1,8 @@
 package movimiento_depositos
 
 type Request struct {
-	IdDepositoOrigen  int64       `form:"id_deposito_origen" json:"id_deposito_origen" binding:"required"`
-	IdDepositoDestino int64       `form:"id_deposito_destino" json:"id_deposito_destino" binding:"required"`
+	IdDepositoOrigen  int64       `form:"id_deposito_origen" json:"id_deposito_origen"`
+	IdDepositoDestino int64       `form:"id_deposito_destino" json:"id_deposito_destino"`
 	Insumos           []Articulos `form:"insumos" json:"insumos,omitempty"`
 	Productos         []Articulos `form:"productos" json:"productos,omitempty"`
 	Status            *string     `form:"status" json:"status" binding:""`

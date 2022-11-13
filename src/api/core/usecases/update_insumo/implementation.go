@@ -40,7 +40,7 @@ func (uc *Implementation) Execute(ctx context.Context, id int64, request update_
 	if request.Nombre == nil && request.Status == nil && request.Stock == nil {
 		insumoDB, err = changeStatusInsumo(insumoDB)
 	} else {
-		insumoDB, err = prepareToUpdate(uc, request, insumoDB)
+		insumoDB, err = uc.prepareToUpdate(request, insumoDB)
 	}
 	if err != nil {
 		return insumoDB, err
@@ -61,7 +61,7 @@ func changeStatusInsumo(insumoDB *entities.Insumo) (*entities.Insumo, error) {
 		return insumoDB, ErrAllreadyCancelled
 	}
 }
-func prepareToUpdate(uc *Implementation, request update_insumo.RequestUpdate, insumoDB *entities.Insumo) (*entities.Insumo, error) {
+func (uc *Implementation) prepareToUpdate(request update_insumo.RequestUpdate, insumoDB *entities.Insumo) (*entities.Insumo, error) {
 	// si se quiere actualizar este campo, valida que no existan duplicados.
 	if request.Nombre != nil && insumoDB.Nombre != *request.Nombre {
 		insumoExists, err := uc.InsumoProvider.Search(nil, request.Nombre)

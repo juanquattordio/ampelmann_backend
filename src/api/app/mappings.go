@@ -51,8 +51,9 @@ func configureAPIMappings(router *gin.Engine, handlers *dependencies.HandlerCont
 	depositos.POST("movimiento/create", handlers.CreateMovimientoDeposito.Handle)
 
 	// Facturas
-	facturasCompra := ampelmannGroup.Group("/facturas-compra")
-	facturasCompra.POST("/create", handlers.CreateFacturaCompra.Handle)
+	facturas := ampelmannGroup.Group("/facturas")
+	facturas.POST("compra/create", handlers.CreateFacturaCompra.Handle)
+	facturas.POST("venta/create", handlers.CreateFacturaVenta.Handle)
 
 	// Recetas
 	recetas := ampelmannGroup.Group("/recetas")

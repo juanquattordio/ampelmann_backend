@@ -17,13 +17,13 @@ type Implementation struct {
 }
 
 func (uc *Implementation) Execute(ctx context.Context, id int64, req update_receta.Request) (*entities.RecetaHeader, error) {
-	if err := validateRequestUpdate(uc, id, &req); err != nil {
+	if err := uc.validateRequestUpdate(id, &req); err != nil {
 		return nil, err
 	}
 
 	recetaToUpdate := entities.NewReceta(id, *req.DetallePasoPaso, req.IdProductoFinal, toEntities(req.Ingredientes), *req.LitrosFinales)
 
-	if err := prepareToUpdate(uc, recetaToUpdate); err != nil {
+	if err := uc.prepareToUpdate(recetaToUpdate); err != nil {
 		return nil, err
 	}
 
@@ -34,7 +34,7 @@ func (uc *Implementation) Execute(ctx context.Context, id int64, req update_rece
 	return recetaToUpdate, nil
 }
 
-func validateRequestUpdate(uc *Implementation, idReceta int64, request *update_receta.Request) error {
+func (uc *Implementation) validateRequestUpdate(idReceta int64, request *update_receta.Request) error {
 	// verifico exista el producto final
 	_, err := uc.ProductoProvider.Search(request.IdProductoFinal, nil)
 	// Si el producto final no está cargado, falla
@@ -57,7 +57,7 @@ func validateRequestUpdate(uc *Implementation, idReceta int64, request *update_r
 	return nil
 }
 
-func prepareToUpdate(uc *Implementation, recetaToUpdate *entities.RecetaHeader) error {
+func (uc *Implementation) prepareToUpdate(recetaToUpdate *entities.RecetaHeader) error {
 	// compara contra los valores de la receta de la BD y actualiza según necesita.
 	recetaBD, err := uc.RecetaProvider.Search(&recetaToUpdate.IdHeader)
 	if err != nil {

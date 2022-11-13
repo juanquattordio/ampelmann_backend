@@ -20,15 +20,14 @@ type Implementation struct {
 
 var (
 	ErrNotFound          = goErrors.New("insumo not found")
-	ErrInsufficientStock = goErrors.New("the stock is insufficient. Operation cancelled.")
+	ErrInsufficientStock = goErrors.New("the stock is not enough. Operation cancelled.")
 	ErrInternal          = goErrors.New("internal error")
 )
 
 func (uc *Implementation) Execute(ctx context.Context, req movimiento_depositos.Request) (*entities.MovimientoHeader, error) {
-	var (
-		movimientoLines []entities.MovimientoLine
-		tipoArticulo    string
-	)
+	var movimientoLines []entities.MovimientoLine
+	var tipoArticulo string
+
 	if req.Productos == nil {
 		// verifico stock disponible en origen
 		stockInsumos, err := uc.StockProvider.GetStockDeposito(ctx, &req.IdDepositoOrigen)
@@ -64,7 +63,6 @@ func (uc *Implementation) Execute(ctx context.Context, req movimiento_depositos.
 
 		movimientoLines = toEntities(req.Productos)
 		tipoArticulo = constants.Productos
-
 	}
 
 	// verifico deposito de destino
@@ -97,6 +95,7 @@ func validarStockInsumosOrigen(movimientos []movimiento_depositos.Articulos, sto
 	for _, lineaMov := range movimientos {
 		stockSuficiente = false
 		for i := 0; i < len(stockDeposito); i++ {
+			msgStockInsuficiente = fmt.Sprintf("Stock insuficiente id_producto: %d", *lineaMov.IdArticulo)
 			if *lineaMov.IdArticulo == stockDeposito[i].IdInsumo {
 				msgStockInsuficiente = fmt.Sprintf("Stock insuficiente id_producto: %d con stock %.2f para este movimiento se necesitan %.2f.",
 					stockDeposito[i].IdInsumo, stockDeposito[i].Stock, *lineaMov.Cantidad)
@@ -116,12 +115,12 @@ func validarStockInsumosOrigen(movimientos []movimiento_depositos.Articulos, sto
 }
 
 func validarStockProductosOrigen(movimientos []movimiento_depositos.Articulos, stockDeposito []entities.ProductoFinal) (stockSuficiente bool, msg string) {
-	stockSuficiente = false
 	var msgStockInsuficiente string
 	// Todo Se podría hacer una búsqueda ordenada o algo más eficiente
 	for _, lineaMov := range movimientos {
 		stockSuficiente = false
 		for i := 0; i < len(stockDeposito); i++ {
+			msgStockInsuficiente = fmt.Sprintf("Stock insuficiente id_producto: %d", *lineaMov.IdArticulo)
 			if *lineaMov.IdArticulo == stockDeposito[i].Id {
 				msgStockInsuficiente = fmt.Sprintf("Stock insuficiente id_producto: %d con stock %.2f para este movimiento se necesitan %.2f.",
 					stockDeposito[i].Id, stockDeposito[i].Stock, *lineaMov.Cantidad)

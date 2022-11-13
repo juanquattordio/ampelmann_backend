@@ -33,7 +33,7 @@ func (uc *Implementation) Execute(ctx context.Context, id int64, request update_
 	if request.Cuit == nil && request.Nombre == nil && request.Ubicacion == nil && request.PaginaWeb == nil && request.Status == nil {
 		proveedorDB, err = changeStatusProveedor(proveedorDB)
 	} else {
-		proveedorDB, err = prepareToUpdate(uc, request, proveedorDB)
+		proveedorDB, err = uc.prepareToUpdate(request, proveedorDB)
 	}
 	if err != nil {
 		return proveedorDB, err
@@ -54,7 +54,7 @@ func changeStatusProveedor(proveedorDB *entities.Proveedor) (*entities.Proveedor
 		return proveedorDB, ErrAllreadyCancelled
 	}
 }
-func prepareToUpdate(uc *Implementation, request update_proveedor.Request, proveedorDB *entities.Proveedor) (*entities.Proveedor, error) {
+func (uc *Implementation) prepareToUpdate(request update_proveedor.Request, proveedorDB *entities.Proveedor) (*entities.Proveedor, error) {
 	// si se quiere actualizar este campo, valida que no existan duplicados.
 	if request.Cuit != nil && proveedorDB.Cuit != *request.Cuit {
 		proveedorExists, err := uc.ProveedorProvider.Search(nil, request.Cuit)

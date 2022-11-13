@@ -27,3 +27,14 @@ func NewFacturaVenta(idCliente int64, lineas []FacturaLine, observaciones string
 
 	return facturaVentaHeader
 }
+
+func (fv *FacturaVentaHeader) ToFacturaCompra() (*FacturaCompraHeader, error) {
+	fc := new(FacturaCompraHeader)
+	fc.IdFactura = fv.IdFactura
+	fc.Fecha = fv.Fecha
+	fc.IdCliente = fv.IdCliente
+	fc.Lineas = fv.Lineas
+	fc.ImporteTotal = fv.ImporteTotal
+	fc.Status = fv.Status
+	return fc, nil
+}

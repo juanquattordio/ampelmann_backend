@@ -1,4 +1,4 @@
-package create_factura_compra
+package create_factura_venta
 
 import (
 	"context"
@@ -7,5 +7,5 @@ import (
 )
 
 type UseCase interface {
-	Execute(context context.Context, request create_factura.RequestFacturaCompra) (*entities.FacturaCompraHeader, error)
+	Execute(context context.Context, request create_factura.RequestFacturaVenta) (*entities.FacturaVentaHeader, error)
 }

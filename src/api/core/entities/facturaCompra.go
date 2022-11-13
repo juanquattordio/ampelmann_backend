@@ -9,6 +9,7 @@ type FacturaCompraHeader struct {
 	IdFactura          int64
 	Fecha              time.Time
 	IdProveedor        int64
+	IdCliente          int64
 	IdFacturaProveedor string
 	FechaOrigen        time.Time
 	Lineas             []FacturaLine

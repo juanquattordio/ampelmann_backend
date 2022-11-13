@@ -35,7 +35,7 @@ func (uc *Implementation) Execute(ctx context.Context, id int64, request update_
 	if request.Descripcion == nil && request.Status == nil {
 		depositoDB, err = changeStatusDeposito(depositoDB)
 	} else {
-		depositoDB, err = prepareToUpdate(uc, request, depositoDB)
+		depositoDB, err = uc.prepareToUpdate(request, depositoDB)
 	}
 	if err != nil {
 		return depositoDB, err
@@ -69,7 +69,7 @@ func changeStatusDeposito(depositoDB *entities.Deposito) (*entities.Deposito, er
 		return depositoDB, ErrAllreadyCancelled
 	}
 }
-func prepareToUpdate(uc *Implementation, request update_deposito.Request, depositoDB *entities.Deposito) (*entities.Deposito, error) {
+func (uc *Implementation) prepareToUpdate(request update_deposito.Request, depositoDB *entities.Deposito) (*entities.Deposito, error) {
 	// si se quiere actualizar este campo, valida que no existan duplicados.
 	if request.Descripcion != nil && depositoDB.Descripcion != *request.Descripcion {
 		depositoExists, err := uc.DepositoProvider.Search(nil, request.Descripcion)
