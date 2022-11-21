@@ -1,4 +1,4 @@
-package insumos_reports
+package reports
 
 import (
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/entities"
@@ -6,4 +6,6 @@ import (
 
 type UseCase interface {
 	GetStockInsumosDesactivados() ([]entities.Insumo, error)
+	GetStockProductosDesactivados() ([]entities.ProductoFinal, error)
+	GetClientesDesactivados() ([]entities.Cliente, error)
 }

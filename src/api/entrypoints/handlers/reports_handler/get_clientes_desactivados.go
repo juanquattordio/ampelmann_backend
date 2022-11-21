@@ -1,4 +1,4 @@
-package reports
+package reports_handler
 
 import (
 	"database/sql"
@@ -7,20 +7,20 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/juanquattordio/ampelmann_backend/src/api/config/web"
 	contracts "github.com/juanquattordio/ampelmann_backend/src/api/core/contracts/reports"
-	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/reports/insumos_reports"
+	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/reports"
 	"net/http"
 	"os"
 )
 
-type InsumosReports struct {
-	InsumosReportsUseCase insumos_reports.UseCase
+type ClientesReports struct {
+	ReportsUseCase reports.UseCase
 }
 
-func (handler InsumosReports) Handle(ginContext *gin.Context) {
+func (handler ClientesReports) Handle(ginContext *gin.Context) {
 	handler.handle(ginContext)
 }
 
-func (handler InsumosReports) handle(ctx *gin.Context) {
+func (handler ClientesReports) handle(ctx *gin.Context) {
 	token := ctx.GetHeader("token")
 	fmt.Printf("token: " + token)
 	fmt.Printf("token getEnv: " + os.Getenv("TOKEN"))
@@ -29,7 +29,7 @@ func (handler InsumosReports) handle(ctx *gin.Context) {
 		return
 	}
 
-	result, err := handler.InsumosReportsUseCase.GetStockInsumosDesactivados()
+	result, err := handler.ReportsUseCase.GetClientesDesactivados()
 
 	if err != nil {
 		if goErrors.Is(err, sql.ErrNoRows) {
@@ -39,6 +39,6 @@ func (handler InsumosReports) handle(ctx *gin.Context) {
 		}
 		return
 	}
-	ctx.JSON(http.StatusOK, contracts.NewResponseStockInsumosDesactivados(result))
+	ctx.JSON(http.StatusOK, contracts.NewResponseStockClientesDesactivados(result))
 	return
 }

@@ -15,7 +15,7 @@ const (
 	updateScriptMySQL = "UPDATE Cliente SET cuit = ?, nombre = ?, ubicacion = ?, email = ?, status = ? WHERE idCliente = ?"
 )
 
-type cliente struct {
+type Cliente struct {
 	ID        int64  `db:"idCliente"`
 	Cuit      string `db:"cuit"`
 	Nombre    string `db:"nombre"`
@@ -24,8 +24,8 @@ type cliente struct {
 	Status    string `db:"status"`
 }
 
-func newEntity(c entities.Cliente) cliente {
-	return cliente{
+func newEntity(c entities.Cliente) Cliente {
+	return Cliente{
 		ID:        c.ID,
 		Cuit:      c.Cuit,
 		Nombre:    c.Nombre,
@@ -35,7 +35,7 @@ func newEntity(c entities.Cliente) cliente {
 	}
 }
 
-func (dbItem cliente) toEntity() *entities.Cliente {
+func (dbItem Cliente) toEntity() *entities.Cliente {
 	return &entities.Cliente{
 		ID:        dbItem.ID,
 		Cuit:      dbItem.Cuit,

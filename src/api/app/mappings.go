@@ -68,4 +68,6 @@ func configureAPIMappings(router *gin.Engine, handlers *dependencies.HandlerCont
 	// Reportes Informes
 	reports := ampelmannGroup.Group("/reports")
 	reports.GET("/insumos/stock-desactivados", handlers.InsumosReports.Handle)
+	reports.GET("/productos/stock-desactivados", handlers.ProductosReports.Handle)
+	reports.GET("/clientes/desactivados", handlers.ClientesReports.Handle)
 }

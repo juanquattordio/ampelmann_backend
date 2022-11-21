@@ -40,7 +40,7 @@ func (r *Repository) GetLastID() (int64, error) {
 func (r *Repository) Search(id *int64, cuit *string) (*entities.Cliente, error) {
 	whereConditions, args := buildSearchWhere(id, cuit)
 	searchScript := selectScriptMySQL + whereConditions
-	dbCliente := new(cliente)
+	dbCliente := new(Cliente)
 
 	err := r.db.Get(dbCliente, searchScript, args...)
 

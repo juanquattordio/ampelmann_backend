@@ -15,7 +15,7 @@ import (
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/get_stock"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/get_stock_producto"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/movimiento_depositos"
-	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/reports/insumos_reports"
+	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/reports"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/search_cliente"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/search_insumo"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/search_producto_final"
@@ -29,7 +29,7 @@ import (
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/usecases/update_receta"
 	"github.com/juanquattordio/ampelmann_backend/src/api/entrypoints"
 	"github.com/juanquattordio/ampelmann_backend/src/api/entrypoints/handlers/api"
-	"github.com/juanquattordio/ampelmann_backend/src/api/entrypoints/handlers/reports"
+	"github.com/juanquattordio/ampelmann_backend/src/api/entrypoints/handlers/reports_handler"
 	"github.com/juanquattordio/ampelmann_backend/src/api/repositories/administracion/documento"
 	"github.com/juanquattordio/ampelmann_backend/src/api/repositories/batch"
 	"github.com/juanquattordio/ampelmann_backend/src/api/repositories/cliente"
@@ -38,7 +38,7 @@ import (
 	"github.com/juanquattordio/ampelmann_backend/src/api/repositories/producto_final"
 	"github.com/juanquattordio/ampelmann_backend/src/api/repositories/proveedor"
 	"github.com/juanquattordio/ampelmann_backend/src/api/repositories/receta"
-	"github.com/juanquattordio/ampelmann_backend/src/api/repositories/reports/reports_insumos"
+	"github.com/juanquattordio/ampelmann_backend/src/api/repositories/reports_repository"
 	"github.com/juanquattordio/ampelmann_backend/src/api/repositories/stock"
 	"github.com/juanquattordio/ampelmann_backend/src/api/repositories/stock_producto"
 )
@@ -69,6 +69,8 @@ type HandlerContainer struct {
 	DeleteReceta             entrypoints.Handler
 	CreateBatch              entrypoints.Handler
 	InsumosReports           entrypoints.Handler
+	ProductosReports         entrypoints.Handler
+	ClientesReports          entrypoints.Handler
 }
 
 func Start() *HandlerContainer {
@@ -87,7 +89,7 @@ func Start() *HandlerContainer {
 	stockRepository := stock.NewRepository(DB, documentosRepository)
 	stockProductoRepository := stock_producto.NewRepository(DB)
 	batchRepository := batch.NewRepository(DB)
-	insumosReportsRepository := reports_insumos.NewRepository(DB)
+	reportsRepository := reports_repository.NewRepository(DB)
 
 	// Use Cases
 	createClienteUseCase := &create_cliente.Implementation{
@@ -182,8 +184,14 @@ func Start() *HandlerContainer {
 		RecetaProvider:           recetaRepository,
 		MovimientoInsumosUseCase: movimientoDepositoUseCase,
 	}
-	insumosReportsUseCase := &insumos_reports.Implementation{
-		ReportsProvider: insumosReportsRepository,
+	insumosReportsUseCase := &reports.Implementation{
+		ReportsProvider: reportsRepository,
+	}
+	productosReportsUseCase := &reports.Implementation{
+		ReportsProvider: reportsRepository,
+	}
+	clientesReportsUseCase := &reports.Implementation{
+		ReportsProvider: reportsRepository,
 	}
 
 	// API handlers
@@ -260,8 +268,14 @@ func Start() *HandlerContainer {
 	handlers.CreateBatch = &api.CreateBatch{
 		CreateBatchUseCase: createBatchUseCase,
 	}
-	handlers.InsumosReports = &reports.InsumosReports{
-		InsumosReportsUseCase: insumosReportsUseCase,
+	handlers.InsumosReports = &reports_handler.InsumosReports{
+		ReportsUseCase: insumosReportsUseCase,
+	}
+	handlers.ProductosReports = &reports_handler.ProductosReports{
+		ReportsUseCase: productosReportsUseCase,
+	}
+	handlers.ClientesReports = &reports_handler.ClientesReports{
+		ReportsUseCase: clientesReportsUseCase,
 	}
 
 	return &handlers
