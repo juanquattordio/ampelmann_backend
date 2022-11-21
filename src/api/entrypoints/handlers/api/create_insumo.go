@@ -17,16 +17,6 @@ func (handler CreateInsumo) Handle(ginContext *gin.Context) {
 }
 
 func (handler CreateInsumo) handle(ctx *gin.Context) {
-
-	//token := ctx.Request.Header.Get("token")
-	//fmt.Printf("token: " + token)
-	//fmt.Printf("token getEnv: " + os.Getenv("TOKEN"))
-	//if token != os.Getenv("TOKEN") {
-	//	ctx.JSON(401, web.NewResponse(401, nil, "token inválido"))
-	//	return
-	//}
-	// Esto es delegando la validación al ShoulBind
-
 	var request contracts.Request
 
 	if err := ctx.ShouldBindJSON(&request); err != nil {

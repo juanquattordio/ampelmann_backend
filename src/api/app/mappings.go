@@ -64,4 +64,8 @@ func configureAPIMappings(router *gin.Engine, handlers *dependencies.HandlerCont
 	// Batchs Produccion
 	batchs := ampelmannGroup.Group("/batch")
 	batchs.POST("", handlers.CreateBatch.Handle)
+
+	// Reportes Informes
+	reports := ampelmannGroup.Group("/reports")
+	reports.GET("/insumos/stock-desactivados", handlers.InsumosReports.Handle)
 }
