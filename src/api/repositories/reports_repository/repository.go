@@ -5,6 +5,7 @@ import (
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/entities"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/providers"
 	"github.com/juanquattordio/ampelmann_backend/src/api/repositories/cliente"
+	"time"
 )
 
 type Repository struct {
@@ -55,4 +56,18 @@ func (r *Repository) GetClientesDesactivados() ([]entities.Cliente, error) {
 
 	clienteResult := toEntitiesClientes(dbCliente)
 	return clienteResult, nil
+}
+
+func (r *Repository) GetFacturacionBetweenDates(dateTo, dateFrom time.Time) (float64, error) {
+	//stmt, err := r.db.Prepare(getFacturacionTotalBetweenDates)
+	//result, err := stmt.Exec(dateTo, dateFrom)
+	//if err != nil {
+	//	return 0, errors.NewInternalServer("Fallo al crear documento")
+	//}
+
+	row := r.db.QueryRow(getFacturacionTotalBetweenDates, dateTo, dateFrom)
+	result := new(float64)
+	err := row.Scan(&result)
+
+	return *result, err
 }

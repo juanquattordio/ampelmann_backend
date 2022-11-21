@@ -3,6 +3,7 @@ package reports
 import (
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/entities"
 	"github.com/juanquattordio/ampelmann_backend/src/api/core/providers"
+	"time"
 )
 
 type Implementation struct {
@@ -31,4 +32,12 @@ func (uc *Implementation) GetClientesDesactivados() ([]entities.Cliente, error) 
 		return nil, err
 	}
 	return clientes, err
+}
+
+func (uc *Implementation) GetFacturacionBetweenDates(dateTo, dateFrom time.Time) (float64, error) {
+	totalAmount, err := uc.ReportsProvider.GetFacturacionBetweenDates(dateTo, dateFrom)
+	if err != nil {
+		return 0, err
+	}
+	return totalAmount, err
 }

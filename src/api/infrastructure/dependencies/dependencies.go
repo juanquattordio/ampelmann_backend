@@ -71,6 +71,7 @@ type HandlerContainer struct {
 	InsumosReports           entrypoints.Handler
 	ProductosReports         entrypoints.Handler
 	ClientesReports          entrypoints.Handler
+	VentasReports            entrypoints.Handler
 }
 
 func Start() *HandlerContainer {
@@ -184,15 +185,18 @@ func Start() *HandlerContainer {
 		RecetaProvider:           recetaRepository,
 		MovimientoInsumosUseCase: movimientoDepositoUseCase,
 	}
-	insumosReportsUseCase := &reports.Implementation{
+	reportsUseCase := &reports.Implementation{
 		ReportsProvider: reportsRepository,
 	}
-	productosReportsUseCase := &reports.Implementation{
-		ReportsProvider: reportsRepository,
-	}
-	clientesReportsUseCase := &reports.Implementation{
-		ReportsProvider: reportsRepository,
-	}
+	//productosReportsUseCase := &reports.Implementation{
+	//	ReportsProvider: reportsRepository,
+	//}
+	//clientesReportsUseCase := &reports.Implementation{
+	//	ReportsProvider: reportsRepository,
+	//}
+	//facturacionReportsUseCase := &reports.Implementation{
+	//	ReportsProvider: reportsRepository,
+	//}
 
 	// API handlers
 	handlers := HandlerContainer{}
@@ -269,13 +273,16 @@ func Start() *HandlerContainer {
 		CreateBatchUseCase: createBatchUseCase,
 	}
 	handlers.InsumosReports = &reports_handler.InsumosReports{
-		ReportsUseCase: insumosReportsUseCase,
+		ReportsUseCase: reportsUseCase,
 	}
 	handlers.ProductosReports = &reports_handler.ProductosReports{
-		ReportsUseCase: productosReportsUseCase,
+		ReportsUseCase: reportsUseCase,
 	}
 	handlers.ClientesReports = &reports_handler.ClientesReports{
-		ReportsUseCase: clientesReportsUseCase,
+		ReportsUseCase: reportsUseCase,
+	}
+	handlers.VentasReports = &reports_handler.FacturacionReports{
+		ReportsUseCase: reportsUseCase,
 	}
 
 	return &handlers

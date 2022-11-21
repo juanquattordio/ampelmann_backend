@@ -6,9 +6,10 @@ import (
 )
 
 const (
-	getStockInsumosDesactivados   = "SELECT I.idInsumo as 'idArticulo', I.nombre, I.unidad_medida, SUM(SI.stock) as 'total_stock', I.status FROM Insumo I INNER JOIN Stock_Insumo SI on I.idInsumo = SI.id_insumo GROUP BY I.idInsumo, I.nombre, I.status HAVING I.status = 'desactivo' AND total_stock>0"
-	getStockProductosDesactivados = "SELECT P.id_producto as 'idArticulo', P.descripcion as 'nombre', P.unidad_medida, SUM(SP.stock) as 'total_stock', P.status FROM Producto_Final P INNER JOIN Stock_Producto SP on P.id_producto = SP.id_producto GROUP BY P.id_producto, P.descripcion, P.status HAVING P.status = 'desactivo' AND total_stock>0"
-	getClientesDesactivados       = "SELECT idCliente, cuit, nombre, ubicacion, email, status FROM Cliente WHERE status = 'desactivo'"
+	getStockInsumosDesactivados     = "SELECT I.idInsumo as 'idArticulo', I.nombre, I.unidad_medida, SUM(SI.stock) as 'total_stock', I.status FROM Insumo I INNER JOIN Stock_Insumo SI on I.idInsumo = SI.id_insumo GROUP BY I.idInsumo, I.nombre, I.status HAVING I.status = 'desactivo' AND total_stock>0"
+	getStockProductosDesactivados   = "SELECT P.id_producto as 'idArticulo', P.descripcion as 'nombre', P.unidad_medida, SUM(SP.stock) as 'total_stock', P.status FROM Producto_Final P INNER JOIN Stock_Producto SP on P.id_producto = SP.id_producto GROUP BY P.id_producto, P.descripcion, P.status HAVING P.status = 'desactivo' AND total_stock>0"
+	getClientesDesactivados         = "SELECT idCliente, cuit, nombre, ubicacion, email, status FROM Cliente WHERE status = 'desactivo'"
+	getFacturacionTotalBetweenDates = "SELECT SUM(importe_total) as 'importe_total' FROM Venta_Factura_Header WHERE fecha BETWEEN ? AND ?"
 )
 
 type articulo struct {

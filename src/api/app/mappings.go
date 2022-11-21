@@ -70,4 +70,5 @@ func configureAPIMappings(router *gin.Engine, handlers *dependencies.HandlerCont
 	reports.GET("/insumos/stock-desactivados", handlers.InsumosReports.Handle)
 	reports.GET("/productos/stock-desactivados", handlers.ProductosReports.Handle)
 	reports.GET("/clientes/desactivados", handlers.ClientesReports.Handle)
+	reports.GET("/facturacion-ventas", handlers.VentasReports.Handle)
 }
