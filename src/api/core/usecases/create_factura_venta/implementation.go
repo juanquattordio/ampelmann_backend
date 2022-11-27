@@ -33,17 +33,14 @@ func (uc *Implementation) Execute(ctx context.Context, request create_factura.Re
 		}
 	}
 
-	newFactura := entities.NewFacturaVenta(*request.IdCliente, toEntities(request.Lineas), request.Observaciones)
-	if err = uc.DocumentoProvider.CreateFacturaVenta(newFactura); err != nil {
-		return nil, goErrors.New(fmt.Sprintf("fallo en la creación de la factura"))
-	}
+	lastIdFactura, err := uc.DocumentoProvider.LastFacturaVenta()
 
 	// Verifica stock disponible en origen y crea un movimiento que ejecuta Updates de stocks en cada depósito
 	idDepositoProductos := int64(3)
 	if request.IdDepositoOrigen != 0 {
 		idDepositoProductos = request.IdDepositoOrigen
 	}
-	causaMovimiento := fmt.Sprintf("FVC-%d", newFactura.IdFactura)
+	causaMovimiento := fmt.Sprintf("FVC-%d", lastIdFactura+1)
 	reqProductoMov := movimientoDeposito.Request{
 		IdDepositoOrigen: idDepositoProductos,
 		Productos:        parseToArticles(request.Lineas),
@@ -51,6 +48,11 @@ func (uc *Implementation) Execute(ctx context.Context, request create_factura.Re
 	_, err = uc.MovimientoDepositoUseCase.Execute(ctx, reqProductoMov)
 	if err != nil {
 		return nil, err
+	}
+
+	newFactura := entities.NewFacturaVenta(*request.IdCliente, toEntities(request.Lineas), request.Observaciones)
+	if err = uc.DocumentoProvider.CreateFacturaVenta(newFactura); err != nil {
+		return nil, goErrors.New(fmt.Sprintf("fallo en la creación de la factura"))
 	}
 
 	return newFactura, nil

@@ -29,7 +29,7 @@ func (uc *Implementation) Execute(ctx context.Context, request create_factura.Re
 	for _, linea := range request.Lineas {
 		productoExists, err := uc.InsumoProvider.Search(linea.IdArticulo, nil)
 		if err != nil || productoExists == nil || goErrors.Is(err, sql.ErrNoRows) {
-			return nil, goErrors.New(fmt.Sprintf("id_insumo %d not found", linea.IdArticulo))
+			return nil, goErrors.New(fmt.Sprintf("id_insumo %d not found", *linea.IdArticulo))
 		}
 		// Carga historial de precio por insumo y proveedor
 		err = uc.ProveedorProvider.UpdateHistorialPrecioInsumo(request.IdProveedor, linea.IdArticulo,
@@ -39,21 +39,23 @@ func (uc *Implementation) Execute(ctx context.Context, request create_factura.Re
 		}
 	}
 
-	newFactura := entities.NewFacturaCompra(*request.IdProveedor, *request.IdFacturaProveedor, time.Time(request.FechaOrigen), toEntities(request.Lineas))
-
-	if err = uc.DocumentoProvider.CreateFacturaCompra(newFactura); err != nil {
-		return nil, goErrors.New(fmt.Sprintf("fallo en la creación de la factura"))
-	}
+	lastIdFactura, err := uc.DocumentoProvider.LastFacturaCompra()
 
 	// Crea un movimiento que ejecuta Updates de stocks en cada depósito
 	idDepositoInsumos := int64(2)
 	if request.IdDepositoDestino != 0 {
 		idDepositoInsumos = request.IdDepositoDestino
 	}
-	causaMovimiento := fmt.Sprintf("FCP-%d", newFactura.IdFactura)
+	causaMovimiento := fmt.Sprintf("FCP-%d", lastIdFactura+1)
 	movimiento := entities.NewMovimientoDeposito(0, idDepositoInsumos, parseToMovLines(request.Lineas), causaMovimiento)
 	if err = uc.StockProvider.MovimientoDepositos(ctx, movimiento, constants.Insumos); err != nil {
 		return nil, goErrors.New(fmt.Sprintf("fallo en la creación del movimiento de insumos por compra"))
+	}
+
+	newFactura := entities.NewFacturaCompra(*request.IdProveedor, *request.IdFacturaProveedor, time.Time(request.FechaOrigen), toEntities(request.Lineas))
+
+	if err = uc.DocumentoProvider.CreateFacturaCompra(newFactura); err != nil {
+		return nil, goErrors.New(fmt.Sprintf("fallo en la creación de la factura"))
 	}
 
 	return newFactura, nil

@@ -59,12 +59,6 @@ func (r *Repository) GetClientesDesactivados() ([]entities.Cliente, error) {
 }
 
 func (r *Repository) GetFacturacionBetweenDates(dateTo, dateFrom time.Time) (float64, error) {
-	//stmt, err := r.db.Prepare(getFacturacionTotalBetweenDates)
-	//result, err := stmt.Exec(dateTo, dateFrom)
-	//if err != nil {
-	//	return 0, errors.NewInternalServer("Fallo al crear documento")
-	//}
-
 	row := r.db.QueryRow(getFacturacionTotalBetweenDates, dateTo, dateFrom)
 	result := new(float64)
 	err := row.Scan(&result)

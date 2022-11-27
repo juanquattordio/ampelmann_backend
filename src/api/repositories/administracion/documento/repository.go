@@ -235,3 +235,25 @@ func (r *Repository) CreateLineFacturaVenta(tx *sqlx.Tx, idHeader int64, idLinea
 
 	return nil
 }
+
+func (r *Repository) LastFacturaVenta() (int64, error) {
+	row := r.db.QueryRow(lastIdFacturaVenta)
+	var lastId int64
+	err := row.Scan(&lastId)
+	if err != nil {
+		return 0, err
+	}
+
+	return lastId, nil
+}
+
+func (r *Repository) LastFacturaCompra() (int64, error) {
+	row := r.db.QueryRow(lastIdFacturaCompra)
+	var lastId int64
+	err := row.Scan(&lastId)
+	if err != nil {
+		return 0, err
+	}
+
+	return lastId, nil
+}

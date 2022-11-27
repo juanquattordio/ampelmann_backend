@@ -15,6 +15,8 @@ const (
 	insertFacturaCompraLine   = "INSERT INTO Compra_Factura_Line (id_factura, id_linea, id_insumo, cantidad, precio_unitario, observaciones) VALUES(?,?,?,?,?,?)"
 	insertFacturaVentaHeader  = "INSERT INTO Venta_Factura_Header (id_cliente, fecha, importe_total, observaciones) VALUES(?,?,?,?)"
 	insertFacturaVentaLine    = "INSERT INTO Venta_Factura_Line (id_factura, id_linea, id_producto, cantidad, precio_unitario, observaciones) VALUES(?,?,?,?,?,?)"
+	lastIdFacturaVenta        = "SELECT id_factura FROM Venta_Factura_Header ORDER BY id_factura DESC limit 1"
+	lastIdFacturaCompra       = "SELECT id_factura FROM Compra_Factura_Header ORDER BY id_factura DESC limit 1"
 )
 
 type stockInsumo struct {

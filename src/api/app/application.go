@@ -10,7 +10,6 @@ import (
 const port = ":8080"
 
 func Start() {
-
 	err := godotenv.Load()
 	if err != nil {
 		fmt.Printf("%serror al cargar archivo .env %s\n", "\033[31m", "\033[0m")
